@@ -62,8 +62,48 @@ body {
   margin-top: 18px;
 }
 
-.connection .label,
-.dashboard-section .label {
+.header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.header-actions .label { margin: 0; }
+
+.settings-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 11px;
+  border: 1px solid #C9BFAF;
+  border-radius: 20px;
+  background: transparent;
+  color: #718675;
+  font: 11px Arial, sans-serif;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+.settings-toggle:hover {
+  background: #E9E1D3;
+}
+
+.settings-toggle svg {
+  width: 14px;
+  height: 14px;
+}
+
+.connection {
+  display: none;
+}
+
+.connection.open {
+  display: block;
+}
+
+.connection .label {
   margin-bottom: 10px;
 }
 
@@ -195,15 +235,33 @@ body {
   </section>
 
   <section class="right">
-    <div class="label">Mountain Time</div>
+    <div class="header-actions">
+      <div class="label">Mountain Time</div>
+      <button
+        id="settings-toggle"
+        class="settings-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="connection-panel"
+      >
+        <svg viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="1.7"
+          stroke-linecap="round" stroke-linejoin="round"
+          aria-hidden="true">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.7 2.9-.2-.1a1.7 1.7 0 0 0-1.8.1l-.2.1h-3.4l-.1-.2a1.7 1.7 0 0 0-1.5-1 1.7 1.7 0 0 0-1.5 1l-.1.2H6l-.1-.2a1.7 1.7 0 0 0-1.5-1l-.2.1-1.7-2.9.1-.1A1.7 1.7 0 0 0 3 14.1l-.1-.2v-3.4l.2-.1a1.7 1.7 0 0 0 1-1.5 1.7 1.7 0 0 0-1-1.5l-.2-.1 1.7-2.9.2.1a1.7 1.7 0 0 0 1.8-.1l.2-.1h3.4l.1.2a1.7 1.7 0 0 0 1.5 1 1.7 1.7 0 0 0 1.5-1l.1-.2h3.4l.1.2a1.7 1.7 0 0 0 1.5 1l.2-.1 1.7 2.9-.1.1a1.7 1.7 0 0 0-.3 1.9l.1.2v3.4z"/>
+        </svg>
+        SETTINGS
+      </button>
+    </div>
     <div id="clock"></div>
   </section>
 </main>
 
-<section class="connection">
-  <div class="label">Notion Connection</div>
+<section id="connection-panel" class="connection">
+  <div class="label">Connection Settings</div>
   <p class="description">
-    Your Command Center connects to your private Tasks and Daily Log databases.
+    Your access key is saved in this browser. Your Command Center reconnects automatically when you open the page.
   </p>
 
   <input
@@ -216,10 +274,10 @@ body {
   >
 
   <div class="actions">
-    <button id="connect-button" class="action-button">
+    <button id="connect-button" class="action-button" type="button">
       Connect / Refresh
     </button>
-    <button id="clear-button" class="action-button secondary">
+    <button id="clear-button" class="action-button secondary" type="button">
       Clear Saved Key
     </button>
   </div>
@@ -287,8 +345,15 @@ const keyInput = document.getElementById("widget-key");
 const connectButton = document.getElementById("connect-button");
 const clearButton = document.getElementById("clear-button");
 const statusBox = document.getElementById("connection-status");
+const settingsToggle = document.getElementById("settings-toggle");
+const connectionPanel = document.getElementById("connection-panel");
 
 keyInput.value = localStorage.getItem(STORAGE_KEY) || "";
+
+settingsToggle.addEventListener("click", () => {
+  const isOpen = connectionPanel.classList.toggle("open");
+  settingsToggle.setAttribute("aria-expanded", String(isOpen));
+});
 
 function getProperty(page, name) {
   return page.properties?.[name];
@@ -406,9 +471,7 @@ function renderTasks(containerId, tasks, emptyMessage) {
       .filter(Boolean)
       .forEach(value => {
         const item = document.createElement("span");
-        item.textContent = value.startsWith("Due ")
-          ? value
-          : value;
+        item.textContent = value;
         details.appendChild(item);
       });
 
@@ -498,10 +561,15 @@ clearButton.addEventListener("click", () => {
   localStorage.removeItem(STORAGE_KEY);
   keyInput.value = "";
   statusBox.textContent = "Saved key cleared from this browser.";
+
   document.getElementById("top-tasks").innerHTML =
     '<div class="empty-state">Connect to Notion to load your priorities.</div>';
+
   document.getElementById("upcoming-tasks").innerHTML =
     '<div class="empty-state">Connect to Notion to load upcoming tasks.</div>';
+
+  document.getElementById("top-count").textContent = "0 TASKS";
+  document.getElementById("upcoming-count").textContent = "0 TASKS";
 });
 
 if (keyInput.value.trim()) {
