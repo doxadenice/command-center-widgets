@@ -5,24 +5,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>My Command Center</title>
+
 <style>
 * { box-sizing: border-box; }
 
 body {
   margin: 0;
-  padding: 20px;
+  padding: 24px 20px 40px;
   background: #E9E1D3;
   color: #244B68;
   font-family: Georgia, serif;
 }
 
-.panel {
+.panel, .connection, .dashboard-section {
   max-width: 900px;
-  margin: auto;
-  padding: 28px 34px;
+  margin: 0 auto 16px;
+  padding: 26px 30px;
   border: 1px solid #C9BFAF;
   border-radius: 14px;
   background: #F4EFE6;
+}
+
+.panel {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -58,16 +62,10 @@ body {
   margin-top: 18px;
 }
 
-.connection {
-  max-width: 900px;
-  margin: 16px auto 0;
-  padding: 24px 28px;
-  border: 1px solid #C9BFAF;
-  border-radius: 14px;
-  background: #F4EFE6;
+.connection .label,
+.dashboard-section .label {
+  margin-bottom: 10px;
 }
-
-.connection .label { margin-bottom: 10px; }
 
 .description {
   font: 13px/1.6 Arial, sans-serif;
@@ -113,17 +111,75 @@ body {
   cursor: wait;
 }
 
-#connection-status {
-  margin-top: 15px;
+#connection-status, #last-updated {
+  margin-top: 14px;
   font: 13px/1.6 Arial, sans-serif;
   color: #52636A;
   overflow-wrap: anywhere;
 }
 
+.dashboard-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.dashboard-heading .label {
+  margin: 0;
+}
+
+.task-list {
+  display: grid;
+  gap: 10px;
+}
+
+.task {
+  padding: 15px 16px;
+  border: 1px solid #D8CFC1;
+  border-radius: 9px;
+  background: #FBF8F2;
+}
+
+.task-title {
+  font-size: 16px;
+  line-height: 1.4;
+  color: #244B68;
+  overflow-wrap: anywhere;
+}
+
+.task-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 14px;
+  margin-top: 8px;
+  font: 11px Arial, sans-serif;
+  color: #718078;
+}
+
+.empty-state {
+  padding: 18px;
+  border: 1px dashed #C9BFAF;
+  border-radius: 9px;
+  color: #718078;
+  font: 13px/1.6 Arial, sans-serif;
+  text-align: center;
+}
+
+.section-count {
+  font: 11px Arial, sans-serif;
+  color: #718675;
+  letter-spacing: 1px;
+}
+
 @media(max-width: 560px) {
-  .panel { padding: 24px; }
+  body { padding: 14px 12px 30px; }
+  .panel, .connection, .dashboard-section {
+    padding: 22px;
+  }
   .right { width: 100%; }
-  .connection { padding: 22px; }
 }
 </style>
 </head>
@@ -147,7 +203,7 @@ body {
 <section class="connection">
   <div class="label">Notion Connection</div>
   <p class="description">
-    Connect your private Tasks and Daily Log databases to your Command Center.
+    Your Command Center connects to your private Tasks and Daily Log databases.
   </p>
 
   <input
@@ -161,7 +217,7 @@ body {
 
   <div class="actions">
     <button id="connect-button" class="action-button">
-      Test Connection
+      Connect / Refresh
     </button>
     <button id="clear-button" class="action-button secondary">
       Clear Saved Key
@@ -169,8 +225,29 @@ body {
   </div>
 
   <div id="connection-status" aria-live="polite">
-    Not connected yet.
+    Checking saved connection...
   </div>
+</section>
+
+<section class="dashboard-section">
+  <div class="dashboard-heading">
+    <div class="label">My Focus · Top 3 Priorities</div>
+    <span id="top-count" class="section-count">0 TASKS</span>
+  </div>
+  <div id="top-tasks" class="task-list">
+    <div class="empty-state">Your priorities will appear here.</div>
+  </div>
+</section>
+
+<section class="dashboard-section">
+  <div class="dashboard-heading">
+    <div class="label">Upcoming Tasks</div>
+    <span id="upcoming-count" class="section-count">0 TASKS</span>
+  </div>
+  <div id="upcoming-tasks" class="task-list">
+    <div class="empty-state">Your upcoming tasks will appear here.</div>
+  </div>
+  <div id="last-updated"></div>
 </section>
 
 <script>
@@ -213,6 +290,71 @@ const statusBox = document.getElementById("connection-status");
 
 keyInput.value = localStorage.getItem(STORAGE_KEY) || "";
 
+function getProperty(page, name) {
+  return page.properties?.[name];
+}
+
+function getTaskTitle(page) {
+  const properties = page.properties || {};
+  const titleProperty =
+    properties.Task ||
+    Object.values(properties).find(property => property.type === "title");
+
+  return titleProperty?.title
+    ?.map(item => item.plain_text || "")
+    .join("") || "Untitled task";
+}
+
+function getStatus(page) {
+  const property = getProperty(page, "Status");
+  return property?.status?.name || property?.select?.name || "";
+}
+
+function getPriority(page) {
+  return getProperty(page, "Priority")?.select?.name || "";
+}
+
+function getDueDate(page) {
+  return getProperty(page, "Due Date")?.date?.start || "";
+}
+
+function isTopPriority(page) {
+  return getProperty(page, "Top 3")?.checkbox === true;
+}
+
+function isCompleted(page) {
+  return getStatus(page).toLowerCase() === "completed";
+}
+
+function formatDate(dateString) {
+  if (!dateString) return "";
+
+  const date = new Date(dateString + "T12:00:00");
+
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Denver",
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  }).format(date);
+}
+
+function todayInMountainTime() {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Denver",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(new Date());
+
+  const values = {};
+  parts.forEach(part => {
+    values[part.type] = part.value;
+  });
+
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
 async function checkDatabase(resource, key) {
   const response = await fetch(
     `${API_BASE}/?resource=${encodeURIComponent(resource)}`,
@@ -233,7 +375,94 @@ async function checkDatabase(resource, key) {
   return data;
 }
 
-connectButton.addEventListener("click", async () => {
+function renderTasks(containerId, tasks, emptyMessage) {
+  const container = document.getElementById(containerId);
+  container.replaceChildren();
+
+  if (!tasks.length) {
+    const empty = document.createElement("div");
+    empty.className = "empty-state";
+    empty.textContent = emptyMessage;
+    container.appendChild(empty);
+    return;
+  }
+
+  tasks.forEach(task => {
+    const card = document.createElement("article");
+    card.className = "task";
+
+    const title = document.createElement("div");
+    title.className = "task-title";
+    title.textContent = getTaskTitle(task);
+
+    const details = document.createElement("div");
+    details.className = "task-details";
+
+    const priority = getPriority(task);
+    const dueDate = getDueDate(task);
+    const status = getStatus(task);
+
+    [priority, dueDate ? `Due ${formatDate(dueDate)}` : "", status]
+      .filter(Boolean)
+      .forEach(value => {
+        const item = document.createElement("span");
+        item.textContent = value.startsWith("Due ")
+          ? value
+          : value;
+        details.appendChild(item);
+      });
+
+    card.appendChild(title);
+    if (details.children.length) card.appendChild(details);
+    container.appendChild(card);
+  });
+}
+
+function displayDashboard(pages) {
+  const activeTasks = pages.filter(page => !isCompleted(page));
+
+  const topTasks = activeTasks
+    .filter(isTopPriority)
+    .slice(0, 3);
+
+  const today = todayInMountainTime();
+
+  const upcomingTasks = activeTasks
+    .filter(page => {
+      const dueDate = getDueDate(page);
+      return dueDate && dueDate >= today;
+    })
+    .sort((a, b) => getDueDate(a).localeCompare(getDueDate(b)))
+    .slice(0, 8);
+
+  renderTasks(
+    "top-tasks",
+    topTasks,
+    "No active Top 3 priorities selected in Notion."
+  );
+
+  renderTasks(
+    "upcoming-tasks",
+    upcomingTasks,
+    "No upcoming tasks with due dates. Add due dates in Notion to see them here."
+  );
+
+  document.getElementById("top-count").textContent =
+    `${topTasks.length} TASK${topTasks.length === 1 ? "" : "S"}`;
+
+  document.getElementById("upcoming-count").textContent =
+    `${upcomingTasks.length} TASK${upcomingTasks.length === 1 ? "" : "S"}`;
+
+  document.getElementById("last-updated").textContent =
+    "Last refreshed: " +
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Denver",
+      hour: "numeric",
+      minute: "2-digit"
+    }).format(new Date());
+}
+
+async function connectAndRefresh() {
   const key = keyInput.value.trim();
 
   if (!key) {
@@ -242,30 +471,42 @@ connectButton.addEventListener("click", async () => {
   }
 
   connectButton.disabled = true;
-  statusBox.textContent = "Testing both Notion databases...";
+  statusBox.textContent = "Connecting to Notion and loading your tasks...";
 
   try {
     const tasks = await checkDatabase("tasks", key);
-    const dailyLog = await checkDatabase("daily-log", key);
+    await checkDatabase("daily-log", key);
 
     localStorage.setItem(STORAGE_KEY, key);
 
+    displayDashboard(tasks.results || []);
+
     statusBox.textContent =
       `Connected successfully. Tasks: ${tasks.count} records. ` +
-      `Daily Log: ${dailyLog.count} records. Your key is saved in this browser.`;
+      "Daily Log connected. Your dashboard is up to date.";
 
   } catch (error) {
     statusBox.textContent = `Connection failed: ${error.message}`;
   } finally {
     connectButton.disabled = false;
   }
-});
+}
+
+connectButton.addEventListener("click", connectAndRefresh);
 
 clearButton.addEventListener("click", () => {
   localStorage.removeItem(STORAGE_KEY);
   keyInput.value = "";
   statusBox.textContent = "Saved key cleared from this browser.";
+  document.getElementById("top-tasks").innerHTML =
+    '<div class="empty-state">Connect to Notion to load your priorities.</div>';
+  document.getElementById("upcoming-tasks").innerHTML =
+    '<div class="empty-state">Connect to Notion to load upcoming tasks.</div>';
 });
+
+if (keyInput.value.trim()) {
+  connectAndRefresh();
+}
 </script>
 
 </body>
