@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Command Center</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 20px;
+    background: #E9E1D3;
+    color: #244B68;
+    font-family: Georgia, serif;
+  }
+
+  .panel {
+    max-width: 900px;
+    margin: auto;
+    padding: 28px 34px;
+    border: 1px solid #C9BFAF;
+    border-radius: 14px;
+    background: #F4EFE6;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .label {
+    font: 11px Arial, sans-serif;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #718675;
+    margin-bottom: 12px;
+  }
+
+  #day {
+    font-size: 27px;
+    margin-bottom: 7px;
+  }
+
+  #date {
+    font: 14px Arial, sans-serif;
+    color: #52636A;
+  }
+
+  #clock {
+    font-size: clamp(38px, 7vw, 64px);
+    letter-spacing: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rule {
+    height: 2px;
+    width: 52px;
+    background: #B99A5B;
+    margin-top: 18px;
+  }
+
+  @media(max-width: 560px) {
+    .panel { padding: 24px; }
+    .right { width: 100%; }
+  }
+</style>
+</head>
+<body>
+  <main class="panel">
+    <section>
+      <div class="label">My Command Center</div>
+      <div id="day">Monday</div>
+      <div id="date">January 1, 2026</div>
+      <div class="rule"></div>
+    </section>
+
+    <section class="right">
+      <div class="label">Local Time</div>
+      <div id="clock">00:00:00</div>
+    </section>
+  </main>
+
+<script>
+  function updateClock() {
+    const now = new Date();
+
+    document.getElementById("day").textContent =
+      new Intl.DateTimeFormat("en-US", {
+        weekday: "long"
+      }).format(now);
+
+    document.getElementById("date").textContent =
+      new Intl.DateTimeFormat("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric"
+      }).format(now);
+
+    document.getElementById("clock").textContent =
+      new Intl.DateTimeFormat("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true
+      }).format(now);
+  }
+
+  updateClock();
+  setInterval(updateClock, 1000);
+</script>
+</body>
+</html>
