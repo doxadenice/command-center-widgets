@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -57,12 +58,76 @@ body {
   margin-top: 18px;
 }
 
+.connection {
+  max-width: 900px;
+  margin: 16px auto 0;
+  padding: 24px 28px;
+  border: 1px solid #C9BFAF;
+  border-radius: 14px;
+  background: #F4EFE6;
+}
+
+.connection .label { margin-bottom: 10px; }
+
+.description {
+  font: 13px/1.6 Arial, sans-serif;
+  color: #52636A;
+  margin: 0 0 16px;
+}
+
+.key-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #C9BFAF;
+  border-radius: 8px;
+  background: #FBF8F2;
+  color: #244B68;
+  font: 14px Arial, sans-serif;
+  margin-bottom: 12px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.action-button {
+  padding: 11px 17px;
+  border: 0;
+  border-radius: 8px;
+  background: #244B68;
+  color: #F4EFE6;
+  font: 12px Arial, sans-serif;
+  cursor: pointer;
+}
+
+.action-button.secondary {
+  background: #E9E1D3;
+  color: #244B68;
+  border: 1px solid #C9BFAF;
+}
+
+.action-button:disabled {
+  opacity: .55;
+  cursor: wait;
+}
+
+#connection-status {
+  margin-top: 15px;
+  font: 13px/1.6 Arial, sans-serif;
+  color: #52636A;
+  overflow-wrap: anywhere;
+}
+
 @media(max-width: 560px) {
   .panel { padding: 24px; }
   .right { width: 100%; }
+  .connection { padding: 22px; }
 }
 </style>
 </head>
+
 <body>
 
 <main class="panel">
@@ -79,7 +144,39 @@ body {
   </section>
 </main>
 
+<section class="connection">
+  <div class="label">Notion Connection</div>
+  <p class="description">
+    Connect your private Tasks and Daily Log databases to your Command Center.
+  </p>
+
+  <input
+    id="widget-key"
+    class="key-input"
+    type="password"
+    autocomplete="off"
+    placeholder="Enter your private access key"
+    aria-label="Private access key"
+  >
+
+  <div class="actions">
+    <button id="connect-button" class="action-button">
+      Test Connection
+    </button>
+    <button id="clear-button" class="action-button secondary">
+      Clear Saved Key
+    </button>
+  </div>
+
+  <div id="connection-status" aria-live="polite">
+    Not connected yet.
+  </div>
+</section>
+
 <script>
+const API_BASE = "https://command-center-api.doxadenice.workers.dev";
+const STORAGE_KEY = "commandCenterWidgetKey";
+
 function updateClock() {
   const now = new Date();
 
@@ -108,6 +205,67 @@ function updateClock() {
 
 updateClock();
 setInterval(updateClock, 60000);
+
+const keyInput = document.getElementById("widget-key");
+const connectButton = document.getElementById("connect-button");
+const clearButton = document.getElementById("clear-button");
+const statusBox = document.getElementById("connection-status");
+
+keyInput.value = localStorage.getItem(STORAGE_KEY) || "";
+
+async function checkDatabase(resource, key) {
+  const response = await fetch(
+    `${API_BASE}/?resource=${encodeURIComponent(resource)}`,
+    {
+      method: "GET",
+      headers: {
+        "X-Widget-Key": key
+      }
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.error || `Unable to connect to ${resource}.`);
+  }
+
+  return data;
+}
+
+connectButton.addEventListener("click", async () => {
+  const key = keyInput.value.trim();
+
+  if (!key) {
+    statusBox.textContent = "Please enter your access key.";
+    return;
+  }
+
+  connectButton.disabled = true;
+  statusBox.textContent = "Testing both Notion databases...";
+
+  try {
+    const tasks = await checkDatabase("tasks", key);
+    const dailyLog = await checkDatabase("daily-log", key);
+
+    localStorage.setItem(STORAGE_KEY, key);
+
+    statusBox.textContent =
+      `Connected successfully. Tasks: ${tasks.count} records. ` +
+      `Daily Log: ${dailyLog.count} records. Your key is saved in this browser.`;
+
+  } catch (error) {
+    statusBox.textContent = `Connection failed: ${error.message}`;
+  } finally {
+    connectButton.disabled = false;
+  }
+});
+
+clearButton.addEventListener("click", () => {
+  localStorage.removeItem(STORAGE_KEY);
+  keyInput.value = "";
+  statusBox.textContent = "Saved key cleared from this browser.";
+});
 </script>
 
 </body>
