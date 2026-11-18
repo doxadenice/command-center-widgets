@@ -1,67 +1,74 @@
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>My Command Center</title>
-
-<style>
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
-  padding: 24px 20px 40px;
-  background: #E9E1D3;
-  color: #244B68;
-  font-family: Georgia, serif;
+  padding: 30px 20px 48px;
+  background: #F8F7F3;
+  color: #596A70;
+  font-family: Arial, sans-serif;
 }
 
-.panel, .connection, .dashboard-section {
-  max-width: 900px;
-  margin: 0 auto 16px;
-  padding: 26px 30px;
-  border: 1px solid #C9BFAF;
-  border-radius: 14px;
-  background: #F4EFE6;
+/* Main panels */
+.panel,
+.connection,
+.dashboard-section {
+  max-width: 960px;
+  margin: 0 auto 20px;
+  padding: 28px 32px;
+  border: 1px solid #E8E5DD;
+  border-radius: 18px;
+  background: #FFFEFC;
+  box-shadow: 0 4px 18px rgba(92, 105, 105, 0.045);
 }
 
+/* Clock header */
 .panel {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
   flex-wrap: wrap;
+  background: linear-gradient(120deg, #FFFFFF, #F0F6F7);
+  border-color: #E0E9E9;
 }
 
 .label {
   font: 11px Arial, sans-serif;
-  letter-spacing: 3px;
+  letter-spacing: 2.5px;
   text-transform: uppercase;
-  color: #718675;
+  color: #8A9F91;
   margin-bottom: 12px;
 }
 
-#day { font-size: 27px; margin-bottom: 7px; }
+#day {
+  font: 30px Georgia, serif;
+  color: #637E89;
+  margin-bottom: 7px;
+}
 
 #date {
   font: 14px Arial, sans-serif;
-  color: #52636A;
+  color: #8A9697;
 }
 
 #clock {
-  font-size: clamp(38px, 7vw, 64px);
-  letter-spacing: 2px;
+  font: clamp(38px, 7vw, 64px) Georgia, serif;
+  color: #7895A0;
+  letter-spacing: 1px;
   font-variant-numeric: tabular-nums;
 }
 
 .rule {
   height: 2px;
-  width: 52px;
-  background: #B99A5B;
+  width: 54px;
+  background: #D9CBA8;
   margin-top: 18px;
 }
 
+/* Settings */
 .header-actions {
   display: flex;
   align-items: center;
@@ -70,50 +77,63 @@ body {
   margin-bottom: 12px;
 }
 
-.header-actions .label { margin: 0; }
+.header-actions .label {
+  margin: 0;
+}
 
 .settings-toggle {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 8px 11px;
-  border: 1px solid #C9BFAF;
-  border-radius: 20px;
-  background: transparent;
-  color: #718675;
+  padding: 9px 13px;
+  border: 1px solid #DCE6E5;
+  border-radius: 22px;
+  background: #F5F8F6;
+  color: #82988A;
   font: 11px Arial, sans-serif;
   letter-spacing: 1px;
   cursor: pointer;
 }
 
-.settings-toggle:hover { background: #E9E1D3; }
+.settings-toggle:hover {
+  background: #EAF1ED;
+}
 
 .settings-toggle svg {
   width: 14px;
   height: 14px;
 }
 
-.connection { display: none; }
-.connection.open { display: block; }
-.connection .label { margin-bottom: 10px; }
+.connection {
+  display: none;
+}
+
+.connection.open {
+  display: block;
+}
+
+.connection .label {
+  margin-bottom: 10px;
+}
 
 .description {
-  font: 13px/1.6 Arial, sans-serif;
-  color: #52636A;
+  font: 13px/1.7 Arial, sans-serif;
+  color: #879294;
   margin: 0 0 16px;
 }
 
 .key-input {
   width: 100%;
-  padding: 12px 14px;
-  border: 1px solid #C9BFAF;
-  border-radius: 8px;
-  background: #FBF8F2;
-  color: #244B68;
+  padding: 13px 15px;
+  border: 1px solid #E4E5DE;
+  border-radius: 10px;
+  background: #FBFCFA;
+  color: #596A70;
   font: 14px Arial, sans-serif;
   margin-bottom: 12px;
 }
 
+/* Buttons */
 .actions {
   display: flex;
   gap: 10px;
@@ -121,19 +141,24 @@ body {
 }
 
 .action-button {
-  padding: 11px 17px;
-  border: 0;
-  border-radius: 8px;
-  background: #244B68;
-  color: #F4EFE6;
+  padding: 11px 18px;
+  border: 1px solid #DCE7E9;
+  border-radius: 9px;
+  background: #EAF2F3;
+  color: #617D87;
   font: 12px Arial, sans-serif;
   cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.action-button:hover {
+  background: #DCE9EA;
 }
 
 .action-button.secondary {
-  background: #E9E1D3;
-  color: #244B68;
-  border: 1px solid #C9BFAF;
+  background: #F6F4EE;
+  color: #8B9187;
+  border: 1px solid #E8E4D9;
 }
 
 .action-button:disabled {
@@ -141,13 +166,15 @@ body {
   cursor: wait;
 }
 
-#connection-status, #last-updated {
+#connection-status,
+#last-updated {
   margin-top: 14px;
   font: 13px/1.6 Arial, sans-serif;
-  color: #52636A;
+  color: #899596;
   overflow-wrap: anywhere;
 }
 
+/* Dashboard headings */
 .dashboard-heading {
   display: flex;
   align-items: center;
@@ -155,36 +182,57 @@ body {
   gap: 12px;
   flex-wrap: wrap;
   margin-bottom: 18px;
+  padding-bottom: 13px;
+  border-bottom: 1px solid #F0EEE8;
 }
 
-.dashboard-heading .label { margin: 0; }
+.dashboard-heading .label {
+  margin: 0;
+}
 
+.section-count {
+  font: 10px Arial, sans-serif;
+  color: #9BAE9F;
+  letter-spacing: 1px;
+}
+
+/* Tasks and records */
 .task-list {
   display: grid;
-  gap: 10px;
+  gap: 11px;
 }
 
-.task, .record {
-  padding: 15px 16px;
-  border: 1px solid #D8CFC1;
-  border-radius: 9px;
-  background: #FBF8F2;
+.task,
+.record {
+  padding: 17px 19px;
+  border: 1px solid #EAE9E2;
+  border-radius: 12px;
+  background: #FDFCF9;
+  transition: border-color 0.2s ease,
+              background 0.2s ease;
 }
 
-.task-title, .record-title {
-  font-size: 16px;
-  line-height: 1.4;
-  color: #244B68;
+.task:hover,
+.record:hover {
+  border-color: #DCE7E2;
+  background: #FAFCF9;
+}
+
+.task-title,
+.record-title {
+  font: 16px/1.5 Georgia, serif;
+  color: #657D85;
   overflow-wrap: anywhere;
 }
 
-.task-details, .record-details {
+.task-details,
+.record-details {
   display: flex;
   flex-wrap: wrap;
   gap: 7px 14px;
-  margin-top: 8px;
-  font: 11px/1.5 Arial, sans-serif;
-  color: #718078;
+  margin-top: 9px;
+  font: 11px/1.6 Arial, sans-serif;
+  color: #9AABA0;
 }
 
 .record-field {
@@ -192,603 +240,50 @@ body {
 }
 
 .record-field strong {
-  color: #52636A;
+  color: #788C87;
   font-weight: 600;
 }
 
+/* Empty states */
 .empty-state {
-  padding: 18px;
-  border: 1px dashed #C9BFAF;
-  border-radius: 9px;
-  color: #718078;
-  font: 13px/1.6 Arial, sans-serif;
+  padding: 22px 18px;
+  border: 1px dashed #E4E5DC;
+  border-radius: 11px;
+  background: #FDFCF9;
+  color: #A0A9A0;
+  font: 13px/1.7 Arial, sans-serif;
   text-align: center;
 }
 
-.section-count {
-  font: 11px Arial, sans-serif;
-  color: #718675;
-  letter-spacing: 1px;
+/* Keyboard accessibility */
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid #A9C6C9;
+  outline-offset: 3px;
 }
 
+/* Mobile */
 @media(max-width: 560px) {
-  body { padding: 14px 12px 30px; }
-
-  .panel, .connection, .dashboard-section {
-    padding: 22px;
+  body {
+    padding: 14px 12px 30px;
   }
 
-  .right { width: 100%; }
-}
-</style>
-</head>
-
-<body>
-
-<main class="panel">
-  <section>
-    <div class="label">My Command Center</div>
-    <div id="day"></div>
-    <div id="date"></div>
-    <div class="rule"></div>
-  </section>
-
-  <section class="right">
-    <div class="header-actions">
-      <div class="label">Mountain Time</div>
-      <button
-        id="settings-toggle"
-        class="settings-toggle"
-        type="button"
-        aria-expanded="false"
-        aria-controls="connection-panel"
-      >
-        <svg viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="1.7"
-          stroke-linecap="round" stroke-linejoin="round"
-          aria-hidden="true">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.7 2.9-.2-.1a1.7 1.7 0 0 0-1.8.1l-.2.1h-3.4l-.1-.2a1.7 1.7 0 0 0-1.5-1 1.7 1.7 0 0 0-1.5 1l-.1.2H6l-.1-.2a1.7 1.7 0 0 0-1.5-1l-.2.1-1.7-2.9.1-.1A1.7 1.7 0 0 0 3 14.1l-.1-.2v-3.4l.2-.1a1.7 1.7 0 0 0 1-1.5 1.7 1.7 0 0 0-1-1.5l-.2-.1 1.7-2.9.2.1a1.7 1.7 0 0 0 1.8-.1l.2-.1h3.4l.1.2a1.7 1.7 0 0 0 1.5 1 1.7 1.7 0 0 0 1.5-1l.1-.2h3.4l.1.2a1.7 1.7 0 0 0 1.5 1l.2-.1 1.7 2.9-.1.1a1.7 1.7 0 0 0-.3 1.9l.1.2v3.4z"/>
-        </svg>
-        SETTINGS
-      </button>
-    </div>
-    <div id="clock"></div>
-  </section>
-</main>
-
-<section id="connection-panel" class="connection">
-  <div class="label">Connection Settings</div>
-  <p class="description">
-    Your access key is saved in this browser. Your Command Center reconnects automatically when you open the page.
-  </p>
-
-  <input
-    id="widget-key"
-    class="key-input"
-    type="password"
-    autocomplete="off"
-    placeholder="Enter your private access key"
-    aria-label="Private access key"
-  >
-
-  <div class="actions">
-    <button id="connect-button" class="action-button" type="button">
-      Connect / Refresh
-    </button>
-    <button id="clear-button" class="action-button secondary" type="button">
-      Clear Saved Key
-    </button>
-  </div>
-
-  <div id="connection-status" aria-live="polite">
-    Checking saved connection...
-  </div>
-</section>
-
-<section class="dashboard-section">
-  <div class="dashboard-heading">
-    <div class="label">My Focus · Top 3 Priorities</div>
-    <span id="top-count" class="section-count">0 TASKS</span>
-  </div>
-  <div id="top-tasks" class="task-list">
-    <div class="empty-state">Your priorities will appear here.</div>
-  </div>
-</section>
-
-<section class="dashboard-section">
-  <div class="dashboard-heading">
-    <div class="label">Upcoming Tasks</div>
-    <span id="upcoming-count" class="section-count">0 TASKS</span>
-  </div>
-  <div id="upcoming-tasks" class="task-list">
-    <div class="empty-state">Your upcoming tasks will appear here.</div>
-  </div>
-</section>
-
-<section class="dashboard-section">
-  <div class="dashboard-heading">
-    <div class="label">Money & Finances · Project Ledger</div>
-    <span id="ledger-count" class="section-count">0 ENTRIES</span>
-  </div>
-  <div id="ledger-entries" class="task-list">
-    <div class="empty-state">Your financial entries will appear here.</div>
-  </div>
-</section>
-
-<section class="dashboard-section">
-  <div class="dashboard-heading">
-    <div class="label">Meal Planning</div>
-    <span id="meal-count" class="section-count">0 MEALS</span>
-  </div>
-  <div id="meal-entries" class="task-list">
-    <div class="empty-state">Your planned meals will appear here.</div>
-  </div>
-  <div id="last-updated"></div>
-</section>
-
-<script>
-const API_BASE = "https://command-center-api.doxadenice.workers.dev";
-const STORAGE_KEY = "commandCenterWidgetKey";
-
-function updateClock() {
-  const now = new Date();
-
-  document.getElementById("day").textContent =
-    new Intl.DateTimeFormat("en-US", {
-      timeZone: "America/Denver",
-      weekday: "long"
-    }).format(now);
-
-  document.getElementById("date").textContent =
-    new Intl.DateTimeFormat("en-US", {
-      timeZone: "America/Denver",
-      month: "long",
-      day: "numeric",
-      year: "numeric"
-    }).format(now);
-
-  document.getElementById("clock").textContent =
-    new Intl.DateTimeFormat("en-US", {
-      timeZone: "America/Denver",
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true
-    }).format(now);
-}
-
-updateClock();
-setInterval(updateClock, 60000);
-
-const keyInput = document.getElementById("widget-key");
-const connectButton = document.getElementById("connect-button");
-const clearButton = document.getElementById("clear-button");
-const statusBox = document.getElementById("connection-status");
-const settingsToggle = document.getElementById("settings-toggle");
-const connectionPanel = document.getElementById("connection-panel");
-
-keyInput.value = localStorage.getItem(STORAGE_KEY) || "";
-
-settingsToggle.addEventListener("click", () => {
-  const isOpen = connectionPanel.classList.toggle("open");
-  settingsToggle.setAttribute("aria-expanded", String(isOpen));
-});
-
-function getProperty(page, name) {
-  return page.properties?.[name];
-}
-
-function getTaskTitle(page) {
-  const properties = page.properties || {};
-  const titleProperty =
-    properties.Task ||
-    Object.values(properties).find(property => property.type === "title");
-
-  return titleProperty?.title
-    ?.map(item => item.plain_text || "")
-    .join("") || "Untitled task";
-}
-
-function getStatus(page) {
-  const property = getProperty(page, "Status");
-  return property?.status?.name || property?.select?.name || "";
-}
-
-function getPriority(page) {
-  return getProperty(page, "Priority")?.select?.name || "";
-}
-
-function getDueDate(page) {
-  return getProperty(page, "Due Date")?.date?.start || "";
-}
-
-function isTopPriority(page) {
-  return getProperty(page, "Top 3")?.checkbox === true;
-}
-
-function isCompleted(page) {
-  return getStatus(page).toLowerCase() === "completed";
-}
-
-function formatDate(dateString) {
-  if (!dateString) return "";
-
-  const date = new Date(dateString + "T12:00:00");
-
-  if (Number.isNaN(date.getTime())) return dateString;
-
-  return new Intl.DateTimeFormat("en-US", {
-    timeZone: "America/Denver",
-    month: "short",
-    day: "numeric",
-    year: "numeric"
-  }).format(date);
-}
-
-function todayInMountainTime() {
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "America/Denver",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit"
-  }).formatToParts(new Date());
-
-  const values = {};
-  parts.forEach(part => {
-    values[part.type] = part.value;
-  });
-
-  return `${values.year}-${values.month}-${values.day}`;
-}
-
-async function checkDatabase(resource, key) {
-  const response = await fetch(
-    `${API_BASE}/?resource=${encodeURIComponent(resource)}`,
-    {
-      method: "GET",
-      headers: {
-        "X-Widget-Key": key
-      }
-    }
-  );
-
-  const data = await response.json();
-
-  if (!response.ok || !data.success) {
-    throw new Error(data.error || `Unable to connect to ${resource}.`);
+  .panel,
+  .connection,
+  .dashboard-section {
+    padding: 21px;
+    border-radius: 14px;
   }
 
-  return data;
-}
-
-function renderTasks(containerId, tasks, emptyMessage) {
-  const container = document.getElementById(containerId);
-  container.replaceChildren();
-
-  if (!tasks.length) {
-    const empty = document.createElement("div");
-    empty.className = "empty-state";
-    empty.textContent = emptyMessage;
-    container.appendChild(empty);
-    return;
+  .right {
+    width: 100%;
   }
 
-  tasks.forEach(task => {
-    const card = document.createElement("article");
-    card.className = "task";
-
-    const title = document.createElement("div");
-    title.className = "task-title";
-    title.textContent = getTaskTitle(task);
-
-    const details = document.createElement("div");
-    details.className = "task-details";
-
-    const priority = getPriority(task);
-    const dueDate = getDueDate(task);
-    const status = getStatus(task);
-
-    [priority, dueDate ? `Due ${formatDate(dueDate)}` : "", status]
-      .filter(Boolean)
-      .forEach(value => {
-        const item = document.createElement("span");
-        item.textContent = value;
-        details.appendChild(item);
-      });
-
-    card.appendChild(title);
-    if (details.children.length) card.appendChild(details);
-    container.appendChild(card);
-  });
-}
-
-function displayDashboard(pages) {
-  const activeTasks = pages.filter(page => !isCompleted(page));
-
-  const topTasks = activeTasks
-    .filter(isTopPriority)
-    .slice(0, 3);
-
-  const today = todayInMountainTime();
-
-  const upcomingTasks = activeTasks
-    .filter(page => {
-      const dueDate = getDueDate(page);
-      return dueDate && dueDate >= today;
-    })
-    .sort((a, b) => getDueDate(a).localeCompare(getDueDate(b)))
-    .slice(0, 8);
-
-  renderTasks(
-    "top-tasks",
-    topTasks,
-    "No active Top 3 priorities selected in Notion."
-  );
-
-  renderTasks(
-    "upcoming-tasks",
-    upcomingTasks,
-    "No upcoming tasks with due dates. Add due dates in Notion to see them here."
-  );
-
-  document.getElementById("top-count").textContent =
-    `${topTasks.length} TASK${topTasks.length === 1 ? "" : "S"}`;
-
-  document.getElementById("upcoming-count").textContent =
-    `${upcomingTasks.length} TASK${upcomingTasks.length === 1 ? "" : "S"}`;
-}
-
-// Convert Notion property values into readable text.
-function getPropertyText(property) {
-  if (!property) return "";
-
-  switch (property.type) {
-    case "title":
-    case "rich_text":
-      return (property[property.type] || [])
-        .map(item => item.plain_text || "")
-        .join("");
-
-    case "select":
-    case "status":
-      return property[property.type]?.name || "";
-
-    case "multi_select":
-      return (property.multi_select || [])
-        .map(item => item.name)
-        .join(", ");
-
-    case "date":
-      return property.date?.start
-        ? formatDate(property.date.start)
-        : "";
-
-    case "number":
-      return property.number === null ? "" : String(property.number);
-
-    case "checkbox":
-      return property.checkbox ? "Yes" : "No";
-
-    case "url":
-      return property.url || "";
-
-    case "email":
-      return property.email || "";
-
-    case "phone_number":
-      return property.phone_number || "";
-
-    case "formula": {
-      const formula = property.formula;
-      if (!formula) return "";
-      return formula.string ?? formula.number ?? formula.boolean ?? formula.date?.start ?? "";
-    }
-
-    case "created_time":
-      return property.created_time
-        ? formatDate(property.created_time.slice(0, 10))
-        : "";
-
-    case "last_edited_time":
-      return property.last_edited_time
-        ? formatDate(property.last_edited_time.slice(0, 10))
-        : "";
-
-    case "relation":
-      return property.relation?.length
-        ? `${property.relation.length} linked`
-        : "";
-
-    case "people":
-      return (property.people || [])
-        .map(person => person.name || "")
-        .filter(Boolean)
-        .join(", ");
-
-    default:
-      return "";
-  }
-}
-
-function getRecordTitle(page) {
-  const properties = page.properties || {};
-  const titleProperty =
-    Object.values(properties).find(property => property.type === "title");
-
-  if (titleProperty?.title) {
-    const title = titleProperty.title
-      .map(item => item.plain_text || "")
-      .join("");
-
-    if (title) return title;
+  #clock {
+    font-size: 43px;
   }
 
-  return "Untitled entry";
-}
-
-function renderRecords(containerId, countId, pages, emptyMessage, countLabel) {
-  const container = document.getElementById(containerId);
-  container.replaceChildren();
-
-  document.getElementById(countId).textContent =
-    `${pages.length} ${countLabel}${pages.length === 1 ? "" : "S"}`;
-
-  if (!pages.length) {
-    const empty = document.createElement("div");
-    empty.className = "empty-state";
-    empty.textContent = emptyMessage;
-    container.appendChild(empty);
-    return;
-  }
-
-  // Show the most recently edited entries first.
-  const sortedPages = [...pages].sort((a, b) => {
-    return (b.last_edited_time || "").localeCompare(a.last_edited_time || "");
-  });
-
-  sortedPages.slice(0, 8).forEach(page => {
-    const card = document.createElement("article");
-    card.className = "record";
-
-    const title = document.createElement("div");
-    title.className = "record-title";
-    title.textContent = getRecordTitle(page);
-    card.appendChild(title);
-
-    const details = document.createElement("div");
-    details.className = "record-details";
-
-    const properties = page.properties || {};
-
-    Object.entries(properties).forEach(([name, property]) => {
-      if (property.type === "title") return;
-
-      const value = getPropertyText(property);
-      if (!value) return;
-
-      const field = document.createElement("span");
-      field.className = "record-field";
-
-      const label = document.createElement("strong");
-      label.textContent = `${name}: `;
-
-      const content = document.createElement("span");
-      content.textContent = value;
-
-      field.appendChild(label);
-      field.appendChild(content);
-      details.appendChild(field);
-    });
-
-    if (details.children.length) {
-      card.appendChild(details);
-    }
-
-    container.appendChild(card);
-  });
-
-  if (pages.length > 8) {
-    const note = document.createElement("div");
-    note.className = "empty-state";
-    note.textContent = `Showing 8 of ${pages.length} entries.`;
-    container.appendChild(note);
+  #day {
+    font-size: 26px;
   }
 }
-
-function showConnectionError(message) {
-  statusBox.textContent = `Connection failed: ${message}`;
-}
-
-async function connectAndRefresh() {
-  const key = keyInput.value.trim();
-
-  if (!key) {
-    statusBox.textContent = "Please enter your access key.";
-    return;
-  }
-
-  connectButton.disabled = true;
-  statusBox.textContent = "Connecting to all four Notion databases...";
-
-  try {
-    const [tasks, dailyLog, ledger, meals] = await Promise.all([
-      checkDatabase("tasks", key),
-      checkDatabase("daily-log", key),
-      checkDatabase("project-ledger", key),
-      checkDatabase("meal-planner", key)
-    ]);
-
-    localStorage.setItem(STORAGE_KEY, key);
-
-    displayDashboard(tasks.results || []);
-
-    renderRecords(
-      "ledger-entries",
-      "ledger-count",
-      ledger.results || [],
-      "No financial entries were returned from Project Ledger.",
-      "ENTRY"
-    );
-
-    renderRecords(
-      "meal-entries",
-      "meal-count",
-      meals.results || [],
-      "No meals were returned from Meal Planner.",
-      "MEAL"
-    );
-
-    statusBox.textContent =
-      `Connected successfully. Tasks: ${tasks.count}. ` +
-      `Daily Log: ${dailyLog.count}. ` +
-      `Project Ledger: ${ledger.count}. ` +
-      `Meal Planner: ${meals.count}.`;
-
-    document.getElementById("last-updated").textContent =
-      "Last refreshed: " +
-      new Intl.DateTimeFormat("en-US", {
-        timeZone: "America/Denver",
-        hour: "numeric",
-        minute: "2-digit"
-      }).format(new Date());
-
-  } catch (error) {
-    showConnectionError(error.message);
-  } finally {
-    connectButton.disabled = false;
-  }
-}
-
-connectButton.addEventListener("click", connectAndRefresh);
-
-clearButton.addEventListener("click", () => {
-  localStorage.removeItem(STORAGE_KEY);
-  keyInput.value = "";
-  statusBox.textContent = "Saved key cleared from this browser.";
-
-  document.getElementById("top-tasks").innerHTML =
-    '<div class="empty-state">Connect to Notion to load your priorities.</div>';
-
-  document.getElementById("upcoming-tasks").innerHTML =
-    '<div class="empty-state">Connect to Notion to load upcoming tasks.</div>';
-
-  document.getElementById("ledger-entries").innerHTML =
-    '<div class="empty-state">Connect to Notion to load financial entries.</div>';
-
-  document.getElementById("meal-entries").innerHTML =
-    '<div class="empty-state">Connect to Notion to load planned meals.</div>';
-
-  document.getElementById("top-count").textContent = "0 TASKS";
-  document.getElementById("upcoming-count").textContent = "0 TASKS";
-  document.getElementById("ledger-count").textContent = "0 ENTRIES";
-  document.getElementById("meal-count").textContent = "0 MEALS";
-  document.getElementById("last-updated").textContent = "";
-});
-
-if (keyInput.value.trim()) {
-  connectAndRefresh();
-}
-</script>
-
-</body>
-</html>
