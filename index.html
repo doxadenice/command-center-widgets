@@ -86,26 +86,16 @@ body {
   cursor: pointer;
 }
 
-.settings-toggle:hover {
-  background: #E9E1D3;
-}
+.settings-toggle:hover { background: #E9E1D3; }
 
 .settings-toggle svg {
   width: 14px;
   height: 14px;
 }
 
-.connection {
-  display: none;
-}
-
-.connection.open {
-  display: block;
-}
-
-.connection .label {
-  margin-bottom: 10px;
-}
+.connection { display: none; }
+.connection.open { display: block; }
+.connection .label { margin-bottom: 10px; }
 
 .description {
   font: 13px/1.6 Arial, sans-serif;
@@ -167,36 +157,43 @@ body {
   margin-bottom: 18px;
 }
 
-.dashboard-heading .label {
-  margin: 0;
-}
+.dashboard-heading .label { margin: 0; }
 
 .task-list {
   display: grid;
   gap: 10px;
 }
 
-.task {
+.task, .record {
   padding: 15px 16px;
   border: 1px solid #D8CFC1;
   border-radius: 9px;
   background: #FBF8F2;
 }
 
-.task-title {
+.task-title, .record-title {
   font-size: 16px;
   line-height: 1.4;
   color: #244B68;
   overflow-wrap: anywhere;
 }
 
-.task-details {
+.task-details, .record-details {
   display: flex;
   flex-wrap: wrap;
   gap: 7px 14px;
   margin-top: 8px;
-  font: 11px Arial, sans-serif;
+  font: 11px/1.5 Arial, sans-serif;
   color: #718078;
+}
+
+.record-field {
+  overflow-wrap: anywhere;
+}
+
+.record-field strong {
+  color: #52636A;
+  font-weight: 600;
 }
 
 .empty-state {
@@ -216,9 +213,11 @@ body {
 
 @media(max-width: 560px) {
   body { padding: 14px 12px 30px; }
+
   .panel, .connection, .dashboard-section {
     padding: 22px;
   }
+
   .right { width: 100%; }
 }
 </style>
@@ -304,6 +303,26 @@ body {
   </div>
   <div id="upcoming-tasks" class="task-list">
     <div class="empty-state">Your upcoming tasks will appear here.</div>
+  </div>
+</section>
+
+<section class="dashboard-section">
+  <div class="dashboard-heading">
+    <div class="label">Money & Finances · Project Ledger</div>
+    <span id="ledger-count" class="section-count">0 ENTRIES</span>
+  </div>
+  <div id="ledger-entries" class="task-list">
+    <div class="empty-state">Your financial entries will appear here.</div>
+  </div>
+</section>
+
+<section class="dashboard-section">
+  <div class="dashboard-heading">
+    <div class="label">Meal Planning</div>
+    <span id="meal-count" class="section-count">0 MEALS</span>
+  </div>
+  <div id="meal-entries" class="task-list">
+    <div class="empty-state">Your planned meals will appear here.</div>
   </div>
   <div id="last-updated"></div>
 </section>
@@ -395,6 +414,8 @@ function formatDate(dateString) {
   if (!dateString) return "";
 
   const date = new Date(dateString + "T12:00:00");
+
+  if (Number.isNaN(date.getTime())) return dateString;
 
   return new Intl.DateTimeFormat("en-US", {
     timeZone: "America/Denver",
@@ -515,14 +536,167 @@ function displayDashboard(pages) {
 
   document.getElementById("upcoming-count").textContent =
     `${upcomingTasks.length} TASK${upcomingTasks.length === 1 ? "" : "S"}`;
+}
 
-  document.getElementById("last-updated").textContent =
-    "Last refreshed: " +
-    new Intl.DateTimeFormat("en-US", {
-      timeZone: "America/Denver",
-      hour: "numeric",
-      minute: "2-digit"
-    }).format(new Date());
+// Convert Notion property values into readable text.
+function getPropertyText(property) {
+  if (!property) return "";
+
+  switch (property.type) {
+    case "title":
+    case "rich_text":
+      return (property[property.type] || [])
+        .map(item => item.plain_text || "")
+        .join("");
+
+    case "select":
+    case "status":
+      return property[property.type]?.name || "";
+
+    case "multi_select":
+      return (property.multi_select || [])
+        .map(item => item.name)
+        .join(", ");
+
+    case "date":
+      return property.date?.start
+        ? formatDate(property.date.start)
+        : "";
+
+    case "number":
+      return property.number === null ? "" : String(property.number);
+
+    case "checkbox":
+      return property.checkbox ? "Yes" : "No";
+
+    case "url":
+      return property.url || "";
+
+    case "email":
+      return property.email || "";
+
+    case "phone_number":
+      return property.phone_number || "";
+
+    case "formula": {
+      const formula = property.formula;
+      if (!formula) return "";
+      return formula.string ?? formula.number ?? formula.boolean ?? formula.date?.start ?? "";
+    }
+
+    case "created_time":
+      return property.created_time
+        ? formatDate(property.created_time.slice(0, 10))
+        : "";
+
+    case "last_edited_time":
+      return property.last_edited_time
+        ? formatDate(property.last_edited_time.slice(0, 10))
+        : "";
+
+    case "relation":
+      return property.relation?.length
+        ? `${property.relation.length} linked`
+        : "";
+
+    case "people":
+      return (property.people || [])
+        .map(person => person.name || "")
+        .filter(Boolean)
+        .join(", ");
+
+    default:
+      return "";
+  }
+}
+
+function getRecordTitle(page) {
+  const properties = page.properties || {};
+  const titleProperty =
+    Object.values(properties).find(property => property.type === "title");
+
+  if (titleProperty?.title) {
+    const title = titleProperty.title
+      .map(item => item.plain_text || "")
+      .join("");
+
+    if (title) return title;
+  }
+
+  return "Untitled entry";
+}
+
+function renderRecords(containerId, countId, pages, emptyMessage, countLabel) {
+  const container = document.getElementById(containerId);
+  container.replaceChildren();
+
+  document.getElementById(countId).textContent =
+    `${pages.length} ${countLabel}${pages.length === 1 ? "" : "S"}`;
+
+  if (!pages.length) {
+    const empty = document.createElement("div");
+    empty.className = "empty-state";
+    empty.textContent = emptyMessage;
+    container.appendChild(empty);
+    return;
+  }
+
+  // Show the most recently edited entries first.
+  const sortedPages = [...pages].sort((a, b) => {
+    return (b.last_edited_time || "").localeCompare(a.last_edited_time || "");
+  });
+
+  sortedPages.slice(0, 8).forEach(page => {
+    const card = document.createElement("article");
+    card.className = "record";
+
+    const title = document.createElement("div");
+    title.className = "record-title";
+    title.textContent = getRecordTitle(page);
+    card.appendChild(title);
+
+    const details = document.createElement("div");
+    details.className = "record-details";
+
+    const properties = page.properties || {};
+
+    Object.entries(properties).forEach(([name, property]) => {
+      if (property.type === "title") return;
+
+      const value = getPropertyText(property);
+      if (!value) return;
+
+      const field = document.createElement("span");
+      field.className = "record-field";
+
+      const label = document.createElement("strong");
+      label.textContent = `${name}: `;
+
+      const content = document.createElement("span");
+      content.textContent = value;
+
+      field.appendChild(label);
+      field.appendChild(content);
+      details.appendChild(field);
+    });
+
+    if (details.children.length) {
+      card.appendChild(details);
+    }
+
+    container.appendChild(card);
+  });
+
+  if (pages.length > 8) {
+    const note = document.createElement("div");
+    note.className = "empty-state";
+    note.textContent = `Showing 8 of ${pages.length} entries.`;
+    container.appendChild(note);
+  }
+}
+
+function showConnectionError(message) {
+  statusBox.textContent = `Connection failed: ${message}`;
 }
 
 async function connectAndRefresh() {
@@ -534,22 +708,52 @@ async function connectAndRefresh() {
   }
 
   connectButton.disabled = true;
-  statusBox.textContent = "Connecting to Notion and loading your tasks...";
+  statusBox.textContent = "Connecting to all four Notion databases...";
 
   try {
-    const tasks = await checkDatabase("tasks", key);
-    await checkDatabase("daily-log", key);
+    const [tasks, dailyLog, ledger, meals] = await Promise.all([
+      checkDatabase("tasks", key),
+      checkDatabase("daily-log", key),
+      checkDatabase("project-ledger", key),
+      checkDatabase("meal-planner", key)
+    ]);
 
     localStorage.setItem(STORAGE_KEY, key);
 
     displayDashboard(tasks.results || []);
 
+    renderRecords(
+      "ledger-entries",
+      "ledger-count",
+      ledger.results || [],
+      "No financial entries were returned from Project Ledger.",
+      "ENTRY"
+    );
+
+    renderRecords(
+      "meal-entries",
+      "meal-count",
+      meals.results || [],
+      "No meals were returned from Meal Planner.",
+      "MEAL"
+    );
+
     statusBox.textContent =
-      `Connected successfully. Tasks: ${tasks.count} records. ` +
-      "Daily Log connected. Your dashboard is up to date.";
+      `Connected successfully. Tasks: ${tasks.count}. ` +
+      `Daily Log: ${dailyLog.count}. ` +
+      `Project Ledger: ${ledger.count}. ` +
+      `Meal Planner: ${meals.count}.`;
+
+    document.getElementById("last-updated").textContent =
+      "Last refreshed: " +
+      new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/Denver",
+        hour: "numeric",
+        minute: "2-digit"
+      }).format(new Date());
 
   } catch (error) {
-    statusBox.textContent = `Connection failed: ${error.message}`;
+    showConnectionError(error.message);
   } finally {
     connectButton.disabled = false;
   }
@@ -568,8 +772,17 @@ clearButton.addEventListener("click", () => {
   document.getElementById("upcoming-tasks").innerHTML =
     '<div class="empty-state">Connect to Notion to load upcoming tasks.</div>';
 
+  document.getElementById("ledger-entries").innerHTML =
+    '<div class="empty-state">Connect to Notion to load financial entries.</div>';
+
+  document.getElementById("meal-entries").innerHTML =
+    '<div class="empty-state">Connect to Notion to load planned meals.</div>';
+
   document.getElementById("top-count").textContent = "0 TASKS";
   document.getElementById("upcoming-count").textContent = "0 TASKS";
+  document.getElementById("ledger-count").textContent = "0 ENTRIES";
+  document.getElementById("meal-count").textContent = "0 MEALS";
+  document.getElementById("last-updated").textContent = "";
 });
 
 if (keyInput.value.trim()) {
