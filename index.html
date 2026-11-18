@@ -299,6 +299,7 @@ input:focus-visible {
 </head>
 
 <body>
+
 <main class="panel">
   <section>
     <div class="label">My Command Center</div>
@@ -310,6 +311,7 @@ input:focus-visible {
   <section class="right">
     <div class="header-actions">
       <div class="label">Mountain Time</div>
+
       <button
         id="settings-toggle"
         class="settings-toggle"
@@ -327,12 +329,14 @@ input:focus-visible {
         SETTINGS
       </button>
     </div>
+
     <div id="clock"></div>
   </section>
 </main>
 
 <section id="connection-panel" class="connection">
   <div class="label">Connection Settings</div>
+
   <p class="description">
     Your access key is saved in this browser. Your Command Center reconnects automatically when you open the page.
   </p>
@@ -350,6 +354,7 @@ input:focus-visible {
     <button id="connect-button" class="action-button" type="button">
       Connect / Refresh
     </button>
+
     <button id="clear-button" class="action-button secondary" type="button">
       Clear Saved Key
     </button>
@@ -365,6 +370,7 @@ input:focus-visible {
     <div class="label">My Focus · Top 3 Priorities</div>
     <span id="top-count" class="section-count">0 TASKS</span>
   </div>
+
   <div id="top-tasks" class="task-list">
     <div class="empty-state">Your priorities will appear here.</div>
   </div>
@@ -375,6 +381,7 @@ input:focus-visible {
     <div class="label">Upcoming Tasks</div>
     <span id="upcoming-count" class="section-count">0 TASKS</span>
   </div>
+
   <div id="upcoming-tasks" class="task-list">
     <div class="empty-state">Your upcoming tasks will appear here.</div>
   </div>
@@ -385,6 +392,7 @@ input:focus-visible {
     <div class="label">Money & Finances · Project Ledger</div>
     <span id="ledger-count" class="section-count">0 ENTRIES</span>
   </div>
+
   <div id="ledger-entries" class="task-list">
     <div class="empty-state">Your financial entries will appear here.</div>
   </div>
@@ -395,9 +403,11 @@ input:focus-visible {
     <div class="label">Meal Planning</div>
     <span id="meal-count" class="section-count">0 MEALS</span>
   </div>
+
   <div id="meal-entries" class="task-list">
     <div class="empty-state">Your planned meals will appear here.</div>
   </div>
+
   <div id="last-updated"></div>
 </section>
 
@@ -405,6 +415,7 @@ input:focus-visible {
 const API_BASE = "https://command-center-api.doxadenice.workers.dev";
 const STORAGE_KEY = "commandCenterWidgetKey";
 
+/* Mountain Time clock */
 function updateClock() {
   const now = new Date();
 
@@ -434,6 +445,7 @@ function updateClock() {
 updateClock();
 setInterval(updateClock, 60000);
 
+/* Connection controls */
 const keyInput = document.getElementById("widget-key");
 const connectButton = document.getElementById("connect-button");
 const clearButton = document.getElementById("clear-button");
@@ -448,12 +460,14 @@ settingsToggle.addEventListener("click", () => {
   settingsToggle.setAttribute("aria-expanded", String(isOpen));
 });
 
+/* Task properties */
 function getProperty(page, name) {
   return page.properties?.[name];
 }
 
 function getTaskTitle(page) {
   const properties = page.properties || {};
+
   const titleProperty =
     properties.Task ||
     Object.values(properties).find(property => property.type === "title");
@@ -484,6 +498,7 @@ function isCompleted(page) {
   return getStatus(page).toLowerCase() === "completed";
 }
 
+/* Date formatting */
 function formatDate(dateString) {
   if (!dateString) return "";
 
@@ -508,6 +523,7 @@ function todayInMountainTime() {
   }).formatToParts(new Date());
 
   const values = {};
+
   parts.forEach(part => {
     values[part.type] = part.value;
   });
@@ -515,6 +531,7 @@ function todayInMountainTime() {
   return `${values.year}-${values.month}-${values.day}`;
 }
 
+/* Notion API */
 async function checkDatabase(resource, key) {
   const response = await fetch(
     `${API_BASE}/?resource=${encodeURIComponent(resource)}`,
@@ -535,6 +552,7 @@ async function checkDatabase(resource, key) {
   return data;
 }
 
+/* Task rendering */
 function renderTasks(containerId, tasks, emptyMessage) {
   const container = document.getElementById(containerId);
   container.replaceChildren();
@@ -571,11 +589,16 @@ function renderTasks(containerId, tasks, emptyMessage) {
       });
 
     card.appendChild(title);
-    if (details.children.length) card.appendChild(details);
+
+    if (details.children.length) {
+      card.appendChild(details);
+    }
+
     container.appendChild(card);
   });
 }
 
+/* Dashboard task display */
 function displayDashboard(pages) {
   const activeTasks = pages.filter(page => !isCompleted(page));
 
@@ -612,7 +635,7 @@ function displayDashboard(pages) {
     `${upcomingTasks.length} TASK${upcomingTasks.length === 1 ? "" : "S"}`;
 }
 
-// Convert Notion property values into readable text.
+/* Notion property formatting */
 function getPropertyText(property) {
   if (!property) return "";
 
@@ -684,8 +707,10 @@ function getPropertyText(property) {
   }
 }
 
+/* Financial and meal record rendering */
 function getRecordTitle(page) {
   const properties = page.properties || {};
+
   const titleProperty =
     Object.values(properties).find(property => property.type === "title");
 
@@ -727,6 +752,7 @@ function renderRecords(containerId, countId, pages, emptyMessage, countLabel) {
     const title = document.createElement("div");
     title.className = "record-title";
     title.textContent = getRecordTitle(page);
+
     card.appendChild(title);
 
     const details = document.createElement("div");
@@ -769,6 +795,7 @@ function renderRecords(containerId, countId, pages, emptyMessage, countLabel) {
   }
 }
 
+/* Connection and refresh */
 function showConnectionError(message) {
   statusBox.textContent = `Connection failed: ${message}`;
 }
@@ -828,6 +855,7 @@ async function connectAndRefresh() {
 
   } catch (error) {
     showConnectionError(error.message);
+
   } finally {
     connectButton.disabled = false;
   }
@@ -835,9 +863,11 @@ async function connectAndRefresh() {
 
 connectButton.addEventListener("click", connectAndRefresh);
 
+/* Clear saved key */
 clearButton.addEventListener("click", () => {
   localStorage.removeItem(STORAGE_KEY);
   keyInput.value = "";
+
   statusBox.textContent = "Saved key cleared from this browser.";
 
   document.getElementById("top-tasks").innerHTML =
@@ -859,6 +889,7 @@ clearButton.addEventListener("click", () => {
   document.getElementById("last-updated").textContent = "";
 });
 
+/* Automatic reconnection */
 if (keyInput.value.trim()) {
   connectAndRefresh();
 }
