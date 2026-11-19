@@ -1,0 +1,1256 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Command Center | Insights & Analytics</title>
+
+<style>
+* { box-sizing: border-box; }
+
+:root {
+  --marble: #E9E1D3;
+  --cream: #F7F3EB;
+  --white: #FFFEFA;
+  --blue: #244B68;
+  --blue-light: #E0EAF0;
+  --olive: #718675;
+  --olive-light: #E5EBE2;
+  --gold: #B99A5B;
+  --terra: #B77D68;
+  --ink: #35434A;
+  --muted: #7D8582;
+  --border: #DED7C9;
+}
+
+body {
+  margin: 0;
+  padding: 28px 18px 45px;
+  background: var(--marble);
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.container {
+  max-width: 1100px;
+  margin: auto;
+}
+
+header {
+  text-align: center;
+  padding: 10px 0 24px;
+}
+
+.eyebrow {
+  font: 11px Arial, sans-serif;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--olive);
+}
+
+h1 {
+  color: var(--blue);
+  font-weight: normal;
+  font-size: clamp(30px, 5vw, 43px);
+  margin: 12px 0 8px;
+}
+
+.subtitle {
+  color: var(--muted);
+  font: 13px Arial, sans-serif;
+}
+
+.gold-rule {
+  width: 65px;
+  height: 2px;
+  background: var(--gold);
+  margin: 20px auto 0;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.toolbar-left {
+  color: var(--muted);
+  font: 12px Arial, sans-serif;
+}
+
+.toolbar-right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+select, button {
+  font: 12px Arial, sans-serif;
+  border-radius: 7px;
+  padding: 10px 13px;
+  cursor: pointer;
+}
+
+select {
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--ink);
+}
+
+button {
+  border: 1px solid var(--blue);
+  background: var(--blue);
+  color: white;
+}
+
+button:hover { background: #315D7B; }
+
+.settings {
+  margin-bottom: 16px;
+  text-align: right;
+}
+
+.settings-button {
+  background: var(--cream);
+  color: var(--blue);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+}
+
+.connection {
+  display: none;
+  padding: 17px;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 18px;
+}
+
+.connection.open { display: block; }
+
+.connection label {
+  display: block;
+  font: 12px Arial, sans-serif;
+  margin-bottom: 7px;
+}
+
+.connection input {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+
+.connection-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 9px;
+}
+
+.connection-actions button {
+  padding: 9px 13px;
+}
+
+.connection-actions .clear {
+  background: #E8DED4;
+  border-color: #E8DED4;
+  color: var(--ink);
+}
+
+.key-note {
+  font: 11px Arial, sans-serif;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 13px;
+  margin-bottom: 18px;
+}
+
+.metric {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 19px 17px;
+  min-width: 0;
+}
+
+.metric-label {
+  font: 10px Arial, sans-serif;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 10px;
+}
+
+.metric-value {
+  color: var(--blue);
+  font-size: clamp(20px, 3vw, 28px);
+  overflow-wrap: anywhere;
+}
+
+.metric-note {
+  color: var(--muted);
+  font: 10px Arial, sans-serif;
+  margin-top: 6px;
+}
+
+.section-title {
+  color: var(--blue);
+  font-size: 22px;
+  font-weight: normal;
+  margin: 30px 0 13px;
+}
+
+.section-subtitle {
+  color: var(--muted);
+  font: 12px Arial, sans-serif;
+  margin: -7px 0 15px;
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.chart-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  padding: 20px;
+  min-width: 0;
+}
+
+.chart-card h3 {
+  color: var(--blue);
+  font-size: 17px;
+  font-weight: normal;
+  margin: 0 0 5px;
+}
+
+.chart-description {
+  color: var(--muted);
+  font: 11px Arial, sans-serif;
+  margin-bottom: 15px;
+}
+
+canvas {
+  width: 100%;
+  height: 230px;
+  display: block;
+}
+
+.chart-empty {
+  height: 230px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--muted);
+  font: 12px Arial, sans-serif;
+  padding: 20px;
+}
+
+.legend {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  font: 11px Arial, sans-serif;
+  color: var(--muted);
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.progress-track {
+  height: 12px;
+  background: #E9E5DC;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-top: 14px;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0;
+  background: var(--olive);
+  border-radius: 20px;
+  transition: width .3s;
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font: 11px Arial, sans-serif;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+.status {
+  display: none;
+  padding: 13px 15px;
+  margin: 15px 0;
+  border-radius: 8px;
+  font: 12px Arial, sans-serif;
+  line-height: 1.5;
+}
+
+.status.success {
+  display: block;
+  background: var(--olive-light);
+  color: #405B45;
+}
+
+.status.error {
+  display: block;
+  background: #F4E5DF;
+  color: #874C3F;
+}
+
+.status.info {
+  display: block;
+  background: var(--blue-light);
+  color: var(--blue);
+}
+
+footer {
+  text-align: center;
+  color: var(--muted);
+  font: 10px Arial, sans-serif;
+  letter-spacing: 2px;
+  margin-top: 30px;
+}
+
+@media(max-width: 720px) {
+  .metrics { grid-template-columns: repeat(2, 1fr); }
+  .chart-grid { grid-template-columns: 1fr; }
+}
+
+@media(max-width: 420px) {
+  body { padding: 18px 11px 35px; }
+  .metric { padding: 14px 12px; }
+  .metric-label { font-size: 9px; }
+  .toolbar { align-items: stretch; }
+  .toolbar-right { width: 100%; }
+  .toolbar-right select { flex: 1; }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+  <div class="eyebrow">Your Personal Workspace</div>
+  <h1>Insights & Analytics</h1>
+  <div class="subtitle">See the patterns. Measure the progress.</div>
+  <div class="gold-rule"></div>
+</header>
+
+<div class="settings">
+  <button class="settings-button" id="settingsToggle" type="button">
+    ⚙ SETTINGS
+  </button>
+</div>
+
+<div class="connection" id="connectionPanel">
+  <label for="apiKey">Widget Access Key</label>
+  <input id="apiKey" type="password" autocomplete="off"
+    placeholder="Enter your existing Widget Access Key">
+
+  <div class="connection-actions">
+    <button id="saveKey" type="button">Save Key</button>
+    <button id="clearKey" class="clear" type="button">Clear Key</button>
+  </div>
+
+  <div class="key-note">
+    Uses the same browser key as your other Command Center widgets.
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="toolbar-left" id="updatedAt">Waiting for database data…</div>
+  <div class="toolbar-right">
+    <select id="dateRange" aria-label="Date range">
+      <option value="30">Last 30 days</option>
+      <option value="90">Last 90 days</option>
+      <option value="365" selected>Last 12 months</option>
+      <option value="all">All available data</option>
+    </select>
+    <button id="refreshButton" type="button">↻ Refresh</button>
+  </div>
+</div>
+
+<div id="status" class="status"></div>
+
+<h2 class="section-title">Your Overview</h2>
+
+<div class="metrics">
+  <div class="metric">
+    <div class="metric-label">Total Transactions</div>
+    <div class="metric-value" id="transactionCount">—</div>
+    <div class="metric-note">Project Ledger entries</div>
+  </div>
+
+  <div class="metric">
+    <div class="metric-label">Income Recorded</div>
+    <div class="metric-value" id="incomeTotal">—</div>
+    <div class="metric-note">Recognized income entries</div>
+  </div>
+
+  <div class="metric">
+    <div class="metric-label">Expenses Recorded</div>
+    <div class="metric-value" id="expenseTotal">—</div>
+    <div class="metric-note">Recognized expense entries</div>
+  </div>
+
+  <div class="metric">
+    <div class="metric-label">Brain Dump</div>
+    <div class="metric-value" id="brainCount">—</div>
+    <div class="metric-note">Captured entries</div>
+  </div>
+</div>
+
+<h2 class="section-title">Financial Picture</h2>
+<p class="section-subtitle">Your Project Ledger at a glance.</p>
+
+<div class="chart-grid">
+  <div class="chart-card">
+    <h3>Monthly Cash Flow</h3>
+    <div class="chart-description">Income and expenses recorded by month.</div>
+    <canvas id="cashflowChart"></canvas>
+    <div class="legend">
+      <span><i class="dot" style="background:#718675"></i>Income</span>
+      <span><i class="dot" style="background:#B77D68"></i>Expenses</span>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <h3>Spending by Category</h3>
+    <div class="chart-description">Recorded expenses grouped by category.</div>
+    <canvas id="categoryChart"></canvas>
+  </div>
+
+  <div class="chart-card">
+    <h3>Savings Progress</h3>
+    <div class="chart-description">Latest savings balance compared with its target.</div>
+    <div class="metric-value" id="savingsAmount">—</div>
+    <div class="progress-track">
+      <div class="progress-fill" id="savingsBar"></div>
+    </div>
+    <div class="progress-label">
+      <span id="savingsPercent">No target data yet</span>
+      <span id="savingsTarget">Target: —</span>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <h3>Payment Status</h3>
+    <div class="chart-description">How ledger entries are currently classified.</div>
+    <canvas id="paymentChart"></canvas>
+  </div>
+</div>
+
+<h2 class="section-title">Daily Life</h2>
+<p class="section-subtitle">Patterns from your Daily Log and Meal Planning.</p>
+
+<div class="chart-grid">
+  <div class="chart-card">
+    <h3>Mood Check-In</h3>
+    <div class="chart-description">Mood entries recorded in your Daily Log.</div>
+    <canvas id="moodChart"></canvas>
+  </div>
+
+  <div class="chart-card">
+    <h3>Meal Planning</h3>
+    <div class="chart-description">Planned meals grouped by meal type.</div>
+    <canvas id="mealChart"></canvas>
+  </div>
+</div>
+
+<h2 class="section-title">Organization & Progress</h2>
+<p class="section-subtitle">A snapshot of your captured ideas and activity.</p>
+
+<div class="chart-grid">
+  <div class="chart-card">
+    <h3>Brain Dump Status</h3>
+    <div class="chart-description">Captured ideas grouped by status.</div>
+    <canvas id="brainChart"></canvas>
+  </div>
+
+  <div class="chart-card">
+    <h3>Daily Log Activity</h3>
+    <div class="chart-description">Entries recorded by month.</div>
+    <canvas id="dailyChart"></canvas>
+  </div>
+</div>
+
+<footer>COMMAND CENTER · INSIGHTS & ANALYTICS</footer>
+
+</div>
+
+<script>
+const API_BASE = "https://command-center-api.doxadenice.workers.dev";
+const STORAGE_KEY = "commandCenterWidgetKey";
+
+const $ = id => document.getElementById(id);
+
+$("apiKey").value = localStorage.getItem(STORAGE_KEY) || "";
+
+let datasets = {
+  ledger: [],
+  brain: [],
+  daily: [],
+  meals: []
+};
+
+const chartColors = [
+  "#244B68",
+  "#718675",
+  "#B99A5B",
+  "#B77D68",
+  "#8DAEBE",
+  "#9A8AAB",
+  "#A4A18C",
+  "#C19B84"
+];
+
+function showStatus(message, type) {
+  $("status").className = "status " + type;
+  $("status").textContent = message;
+}
+
+function clearStatus() {
+  $("status").className = "status";
+  $("status").textContent = "";
+}
+
+$("settingsToggle").addEventListener("click", () => {
+  $("connectionPanel").classList.toggle("open");
+});
+
+$("saveKey").addEventListener("click", async () => {
+  const key = $("apiKey").value.trim();
+
+  if (!key) {
+    showStatus("Enter your Widget Access Key first.", "error");
+    return;
+  }
+
+  localStorage.setItem(STORAGE_KEY, key);
+  await loadAll();
+});
+
+$("clearKey").addEventListener("click", () => {
+  localStorage.removeItem(STORAGE_KEY);
+  $("apiKey").value = "";
+  showStatus("Saved key cleared from this browser.", "info");
+});
+
+$("refreshButton").addEventListener("click", loadAll);
+$("dateRange").addEventListener("change", renderAll);
+
+async function fetchResource(resource) {
+  const key = localStorage.getItem(STORAGE_KEY) || "";
+
+  if (!key) {
+    throw new Error("Open Settings and enter your Widget Access Key.");
+  }
+
+  const url = new URL(API_BASE);
+  url.searchParams.set("resource", resource);
+
+  const response = await fetch(url.toString(), {
+    method: "GET",
+    headers: { "X-Widget-Key": key }
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.error || "Unable to load " + resource);
+  }
+
+  return data.results || [];
+}
+
+async function loadAll() {
+  clearStatus();
+  $("updatedAt").textContent = "Loading your Notion data…";
+  $("refreshButton").disabled = true;
+
+  try {
+    const resources = [
+      ["ledger", "project-ledger"],
+      ["brain", "brain-dump"],
+      ["daily", "daily-log"],
+      ["meals", "meal-planner"]
+    ];
+
+    const outcomes = await Promise.allSettled(
+      resources.map(([, resource]) => fetchResource(resource))
+    );
+
+    const errors = [];
+
+    outcomes.forEach((result, index) => {
+      const [name, resource] = resources[index];
+
+      if (result.status === "fulfilled") {
+        datasets[name] = result.value;
+      } else {
+        datasets[name] = [];
+        errors.push(resource + ": " + result.reason.message);
+      }
+    });
+
+    renderAll();
+
+    $("updatedAt").textContent =
+      "Last refreshed " + new Date().toLocaleTimeString();
+
+    if (errors.length) {
+      showStatus(
+        "Some data could not be loaded: " + errors.join(" · "),
+        "error"
+      );
+    } else {
+      showStatus("All four databases connected successfully.", "success");
+    }
+
+  } catch (error) {
+    showStatus(error.message, "error");
+  } finally {
+    $("refreshButton").disabled = false;
+  }
+}
+
+/* Notion property readers */
+
+function getProperty(page, name) {
+  return page?.properties?.[name] || null;
+}
+
+function readValue(page, name) {
+  const property = getProperty(page, name);
+  if (!property) return null;
+
+  const type = property.type;
+
+  if (type === "title" || type === "rich_text") {
+    return (property[type] || [])
+      .map(item => item.plain_text || item.text?.content || "")
+      .join("");
+  }
+
+  if (type === "select" || type === "status") {
+    return property[type]?.name || "";
+  }
+
+  if (type === "multi_select") {
+    return (property.multi_select || [])
+      .map(item => item.name)
+      .join(", ");
+  }
+
+  if (type === "date") {
+    return property.date?.start || "";
+  }
+
+  if (type === "number") {
+    return property.number;
+  }
+
+  if (type === "checkbox") {
+    return property.checkbox;
+  }
+
+  if (type === "url") return property.url || "";
+  if (type === "email") return property.email || "";
+  if (type === "phone_number") return property.phone_number || "";
+
+  if (type === "formula") {
+    const formula = property.formula;
+    if (!formula) return null;
+    return formula.number ?? formula.string ?? formula.boolean ?? null;
+  }
+
+  if (type === "rollup") {
+    const rollup = property.rollup;
+    if (!rollup) return null;
+    if (rollup.type === "number") return rollup.number;
+    if (rollup.type === "date") return rollup.date?.start || "";
+    return null;
+  }
+
+  return null;
+}
+
+function readText(page, name) {
+  const value = readValue(page, name);
+  return value === null || value === undefined ? "" : String(value);
+}
+
+function readNumber(page, name) {
+  const value = readValue(page, name);
+
+  if (typeof value === "number") return value;
+  if (value === null || value === "") return 0;
+
+  const cleaned = String(value).replace(/[$,%\s,]/g, "");
+  const number = Number(cleaned);
+
+  return Number.isFinite(number) ? number : 0;
+}
+
+function readDate(page, name) {
+  const value = readValue(page, name);
+  if (!value) return null;
+
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function inRange(date) {
+  if (!date) return true;
+
+  const range = $("dateRange").value;
+  if (range === "all") return true;
+
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - Number(range));
+
+  return date >= cutoff;
+}
+
+function money(value) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0
+  }).format(value || 0);
+}
+
+function countBy(items, getter) {
+  const counts = {};
+
+  items.forEach(item => {
+    const value = getter(item);
+    if (!value) return;
+    counts[value] = (counts[value] || 0) + 1;
+  });
+
+  return counts;
+}
+
+function filtered(items, dateProperty) {
+  return items.filter(item => inRange(readDate(item, dateProperty)));
+}
+
+/* Canvas chart helpers */
+
+function prepareCanvas(canvas) {
+  const rect = canvas.getBoundingClientRect();
+  const ratio = window.devicePixelRatio || 1;
+
+  canvas.width = Math.max(1, rect.width * ratio);
+  canvas.height = Math.max(1, rect.height * ratio);
+
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+  return { ctx, width: rect.width, height: rect.height };
+}
+
+function emptyCanvas(id, message = "No data available for this period.") {
+  const canvas = $(id);
+  const { ctx, width, height } = prepareCanvas(canvas);
+
+  ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = "#7D8582";
+  ctx.font = "12px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText(message, width / 2, height / 2);
+}
+
+function drawBars(id, labels, values, options = {}) {
+  if (!labels.length) {
+    emptyCanvas(id);
+    return;
+  }
+
+  const canvas = $(id);
+  const { ctx, width, height } = prepareCanvas(canvas);
+
+  ctx.clearRect(0, 0, width, height);
+
+  const left = 38;
+  const right = 10;
+  const top = 14;
+  const bottom = 37;
+  const plotHeight = height - top - bottom;
+  const plotWidth = width - left - right;
+  const max = Math.max(...values, 1);
+
+  ctx.font = "10px Arial";
+  ctx.textAlign = "right";
+  ctx.fillStyle = "#89918D";
+
+  for (let i = 0; i <= 4; i++) {
+    const y = top + plotHeight - (plotHeight * i / 4);
+    ctx.strokeStyle = "#EAE6DE";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(left, y);
+    ctx.lineTo(width - right, y);
+    ctx.stroke();
+
+    const value = max * i / 4;
+    const label = options.money
+      ? money(value).replace("$", "")
+      : Math.round(value).toString();
+
+    ctx.fillText(label, left - 6, y + 3);
+  }
+
+  const step = plotWidth / labels.length;
+  const barWidth = Math.min(34, step * .58);
+
+  values.forEach((value, index) => {
+    const barHeight = value / max * plotHeight;
+    const x = left + step * index + (step - barWidth) / 2;
+    const y = top + plotHeight - barHeight;
+
+    ctx.fillStyle = options.colors?.[index] ||
+      options.color || "#718675";
+
+    ctx.beginPath();
+    ctx.roundRect(x, y, barWidth, Math.max(0, barHeight), 4);
+    ctx.fill();
+
+    ctx.fillStyle = "#7D8582";
+    ctx.textAlign = "center";
+    ctx.font = "9px Arial";
+
+    const label = labels[index].length > 9
+      ? labels[index].slice(0, 8) + "…"
+      : labels[index];
+
+    ctx.fillText(label, x + barWidth / 2, height - 14);
+  });
+}
+
+function drawGroupedBars(id, labels, series) {
+  if (!labels.length) {
+    emptyCanvas(id);
+    return;
+  }
+
+  const canvas = $(id);
+  const { ctx, width, height } = prepareCanvas(canvas);
+
+  ctx.clearRect(0, 0, width, height);
+
+  const left = 40;
+  const right = 10;
+  const top = 12;
+  const bottom = 36;
+  const plotHeight = height - top - bottom;
+  const plotWidth = width - left - right;
+
+  const max = Math.max(
+    1,
+    ...series.flatMap(item => item.values)
+  );
+
+  ctx.font = "10px Arial";
+  ctx.textAlign = "right";
+  ctx.fillStyle = "#89918D";
+
+  for (let i = 0; i <= 4; i++) {
+    const y = top + plotHeight - plotHeight * i / 4;
+    ctx.strokeStyle = "#EAE6DE";
+    ctx.beginPath();
+    ctx.moveTo(left, y);
+    ctx.lineTo(width - right, y);
+    ctx.stroke();
+
+    ctx.fillText(
+      Math.round(max * i / 4).toString(),
+      left - 6,
+      y + 3
+    );
+  }
+
+  const step = plotWidth / labels.length;
+  const groupWidth = Math.min(52, step * .72);
+  const eachWidth = groupWidth / series.length;
+
+  labels.forEach((label, i) => {
+    series.forEach((item, j) => {
+      const value = item.values[i] || 0;
+      const barHeight = value / max * plotHeight;
+      const x = left + step * i +
+        (step - groupWidth) / 2 + j * eachWidth;
+      const y = top + plotHeight - barHeight;
+
+      ctx.fillStyle = item.color;
+      ctx.beginPath();
+      ctx.roundRect(
+        x, y,
+        Math.max(2, eachWidth - 2),
+        Math.max(0, barHeight),
+        3
+      );
+      ctx.fill();
+    });
+
+    ctx.fillStyle = "#7D8582";
+    ctx.textAlign = "center";
+    ctx.font = "9px Arial";
+    ctx.fillText(label, left + step * i + step / 2, height - 14);
+  });
+}
+
+function drawDonut(id, entries) {
+  const usable = entries.filter(item => item.value > 0);
+
+  if (!usable.length) {
+    emptyCanvas(id);
+    return;
+  }
+
+  const canvas = $(id);
+  const { ctx, width, height } = prepareCanvas(canvas);
+
+  ctx.clearRect(0, 0, width, height);
+
+  const total = usable.reduce((sum, item) => sum + item.value, 0);
+  const cx = width / 2;
+  const cy = height / 2;
+  const radius = Math.min(width * .22, height * .34);
+  const thickness = radius * .35;
+
+  let angle = -Math.PI / 2;
+
+  usable.forEach((item, index) => {
+    const slice = item.value / total * Math.PI * 2;
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, angle, angle + slice);
+    ctx.strokeStyle = chartColors[index % chartColors.length];
+    ctx.lineWidth = thickness;
+    ctx.stroke();
+
+    angle += slice;
+  });
+
+  ctx.fillStyle = "#244B68";
+  ctx.font = "bold 19px Georgia";
+  ctx.textAlign = "center";
+  ctx.fillText(total.toString(), cx, cy + 5);
+
+  const legendX = Math.max(10, cx + radius + 24);
+  let legendY = Math.max(20, cy - usable.length * 10);
+
+  ctx.font = "10px Arial";
+  ctx.textAlign = "left";
+
+  usable.slice(0, 7).forEach((item, index) => {
+    ctx.fillStyle = chartColors[index % chartColors.length];
+    ctx.fillRect(legendX, legendY - 7, 8, 8);
+
+    ctx.fillStyle = "#68777A";
+
+    const label = item.label.length > 17
+      ? item.label.slice(0, 16) + "…"
+      : item.label;
+
+    ctx.fillText(
+      label + " (" + item.value + ")",
+      legendX + 14,
+      legendY
+    );
+
+    legendY += 20;
+  });
+}
+
+/* Analytics */
+
+function renderAll() {
+  const ledger = filtered(datasets.ledger, "Date");
+  const brain = filtered(datasets.brain, "Captured");
+  const daily = filtered(datasets.daily, "Date");
+  const meals = filtered(datasets.meals, "Date");
+
+  $("transactionCount").textContent = ledger.length;
+  $("brainCount").textContent = brain.length;
+
+  let income = 0;
+  let expenses = 0;
+
+  ledger.forEach(page => {
+    const amount = Math.abs(readNumber(page, "Amount"));
+
+    const type = (
+      readText(page, "Type") + " " +
+      readText(page, "Cash Flow Impact")
+    ).toLowerCase();
+
+    if (/income|revenue|deposit|inflow|received/.test(type)) {
+      income += amount;
+    } else if (/expense|spend|payment|outflow|withdrawal|bill/.test(type)) {
+      expenses += amount;
+    }
+  });
+
+  $("incomeTotal").textContent = money(income);
+  $("expenseTotal").textContent = money(expenses);
+
+  renderCashFlow(ledger);
+  renderCategories(ledger);
+  renderSavings(ledger);
+  renderPayments(ledger);
+  renderMoods(daily);
+  renderMeals(meals);
+  renderBrain(brain);
+  renderDailyActivity(daily);
+}
+
+function renderCashFlow(ledger) {
+  const months = {};
+  const now = new Date();
+  const range = $("dateRange").value;
+  const numberOfMonths = range === "30" ? 1 :
+    range === "90" ? 3 : 12;
+
+  const start = new Date(now.getFullYear(), now.getMonth() -
+    (range === "all" ? 11 : numberOfMonths - 1), 1);
+
+  for (let i = 0; i < (range === "all" ? 12 : numberOfMonths); i++) {
+    const date = new Date(start.getFullYear(), start.getMonth() + i, 1);
+    const key = date.getFullYear() + "-" +
+      String(date.getMonth() + 1).padStart(2, "0");
+
+    months[key] = { income: 0, expenses: 0 };
+  }
+
+  ledger.forEach(page => {
+    const date = readDate(page, "Date");
+    if (!date) return;
+
+    const key = date.getFullYear() + "-" +
+      String(date.getMonth() + 1).padStart(2, "0");
+
+    if (!months[key]) return;
+
+    const amount = Math.abs(readNumber(page, "Amount"));
+    const type = (
+      readText(page, "Type") + " " +
+      readText(page, "Cash Flow Impact")
+    ).toLowerCase();
+
+    if (/income|revenue|deposit|inflow|received/.test(type)) {
+      months[key].income += amount;
+    } else if (/expense|spend|payment|outflow|withdrawal|bill/.test(type)) {
+      months[key].expenses += amount;
+    }
+  });
+
+  const keys = Object.keys(months);
+
+  drawGroupedBars(
+    "cashflowChart",
+    keys.map(key => {
+      const [year, month] = key.split("-");
+      return new Date(Number(year), Number(month) - 1)
+        .toLocaleDateString("en-US", { month: "short" });
+    }),
+    [
+      {
+        color: "#718675",
+        values: keys.map(key => months[key].income)
+      },
+      {
+        color: "#B77D68",
+        values: keys.map(key => months[key].expenses)
+      }
+    ]
+  );
+}
+
+function renderCategories(ledger) {
+  const expenses = ledger.filter(page => {
+    const type = (
+      readText(page, "Type") + " " +
+      readText(page, "Cash Flow Impact")
+    ).toLowerCase();
+
+    return /expense|spend|payment|outflow|withdrawal|bill/.test(type);
+  });
+
+  const totals = {};
+
+  expenses.forEach(page => {
+    const category = readText(page, "Category") || "Uncategorized";
+    totals[category] = (totals[category] || 0) +
+      Math.abs(readNumber(page, "Amount"));
+  });
+
+  const entries = Object.entries(totals)
+    .map(([label, value]) => ({ label, value }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 7);
+
+  drawDonut("categoryChart", entries);
+}
+
+function renderSavings(ledger) {
+  const records = ledger
+    .filter(page =>
+      readValue(page, "Current Savings") !== null ||
+      readValue(page, "Savings Target") !== null
+    )
+    .sort((a, b) => {
+      const da = readDate(a, "Date") || new Date(0);
+      const db = readDate(b, "Date") || new Date(0);
+      return db - da;
+    });
+
+  if (!records.length) {
+    $("savingsAmount").textContent = "—";
+    $("savingsBar").style.width = "0%";
+    $("savingsPercent").textContent = "No savings records found";
+    $("savingsTarget").textContent = "Target: —";
+    return;
+  }
+
+  const latest = records[0];
+  const current = readNumber(latest, "Current Savings");
+  const target = readNumber(latest, "Savings Target");
+
+  $("savingsAmount").textContent = money(current);
+  $("savingsTarget").textContent = "Target: " +
+    (target ? money(target) : "—");
+
+  const percent = target > 0
+    ? Math.max(0, Math.min(100, current / target * 100))
+    : 0;
+
+  $("savingsBar").style.width = percent + "%";
+  $("savingsPercent").textContent = target > 0
+    ? percent.toFixed(1) + "% of target"
+    : "No savings target entered";
+}
+
+function renderPayments(ledger) {
+  const counts = countBy(ledger, page =>
+    readText(page, "Payment Status") || "Unspecified"
+  );
+
+  drawDonut(
+    "paymentChart",
+    Object.entries(counts)
+      .map(([label, value]) => ({ label, value }))
+      .sort((a, b) => b.value - a.value)
+  );
+}
+
+function renderMoods(daily) {
+  const counts = countBy(daily, page =>
+    readText(page, "Mood")
+  );
+
+  drawBars(
+    "moodChart",
+    Object.keys(counts),
+    Object.values(counts),
+    { color: "#718675" }
+  );
+}
+
+function renderMeals(meals) {
+  const counts = countBy(meals, page =>
+    readText(page, "Meal Type") || "Unspecified"
+  );
+
+  drawDonut(
+    "mealChart",
+    Object.entries(counts)
+      .map(([label, value]) => ({ label, value }))
+      .sort((a, b) => b.value - a.value)
+  );
+}
+
+function renderBrain(brain) {
+  const counts = countBy(brain, page =>
+    readText(page, "Status") || "Unspecified"
+  );
+
+  drawDonut(
+    "brainChart",
+    Object.entries(counts)
+      .map(([label, value]) => ({ label, value }))
+      .sort((a, b) => b.value - a.value)
+  );
+}
+
+function renderDailyActivity(daily) {
+  const counts = {};
+
+  daily.forEach(page => {
+    const date = readDate(page, "Date");
+    if (!date) return;
+
+    const key = date.getFullYear() + "-" +
+      String(date.getMonth() + 1).padStart(2, "0");
+
+    counts[key] = (counts[key] || 0) + 1;
+  });
+
+  const keys = Object.keys(counts).sort();
+
+  drawBars(
+    "dailyChart",
+    keys.map(key => {
+      const [year, month] = key.split("-");
+      return new Date(Number(year), Number(month) - 1)
+        .toLocaleDateString("en-US", { month: "short" });
+    }),
+    keys.map(key => counts[key]),
+    { color: "#244B68" }
+  );
+}
+
+let resizeTimer;
+
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(renderAll, 150);
+});
+
+loadAll();
+</script>
+</body>
+</html>
