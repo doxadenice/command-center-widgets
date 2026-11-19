@@ -76,22 +76,33 @@ body {
   margin-top: 18px;
 }
 
-/* Settings */
+/* Header controls */
 .header-actions {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 12px;
+  flex-wrap: wrap;
 }
 
 .header-actions .label {
   margin: 0;
 }
 
-.settings-toggle {
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.settings-toggle,
+.home-button {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 7px;
   padding: 9px 13px;
   border: 1px solid #DCE6E5;
@@ -101,10 +112,20 @@ body {
   font: 11px Arial, sans-serif;
   letter-spacing: 1px;
   cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.2s ease;
 }
 
-.settings-toggle:hover {
+.settings-toggle:hover,
+.home-button:hover {
   background: #EAF1ED;
+}
+
+.home-button {
+  border-color: #D9CBA8;
+  background: #FFFEFC;
+  color: #9A8968;
 }
 
 .settings-toggle svg {
@@ -112,6 +133,7 @@ body {
   height: 14px;
 }
 
+/* Settings */
 .connection {
   display: none;
 }
@@ -265,7 +287,8 @@ body {
 
 /* Keyboard accessibility */
 button:focus-visible,
-input:focus-visible {
+input:focus-visible,
+a:focus-visible {
   outline: 2px solid #A9C6C9;
   outline-offset: 3px;
 }
@@ -294,6 +317,15 @@ input:focus-visible {
   #day {
     font-size: 26px;
   }
+
+  .header-actions {
+    align-items: flex-start;
+  }
+
+  .header-buttons {
+    width: 100%;
+    justify-content: flex-start;
+  }
 }
 </style>
 </head>
@@ -312,22 +344,33 @@ input:focus-visible {
     <div class="header-actions">
       <div class="label">Mountain Time</div>
 
-      <button
-        id="settings-toggle"
-        class="settings-toggle"
-        type="button"
-        aria-expanded="false"
-        aria-controls="connection-panel"
-      >
-        <svg viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="1.7"
-          stroke-linecap="round" stroke-linejoin="round"
-          aria-hidden="true">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.7 2.9-.2-.1a1.7 1.7 0 0 0-1.8.1l-.2.1h-3.4l-.1-.2a1.7 1.7 0 0 0-1.5-1 1.7 1.7 0 0 0-1.5 1l-.1.2H6l-.1-.2a1.7 1.7 0 0 0-1.5-1l-.2.1-1.7-2.9.1-.1A1.7 1.7 0 0 0 3 14.1l-.1-.2v-3.4l.2-.1a1.7 1.7 0 0 0 1-1.5 1.7 1.7 0 0 0-1-1.5l-.2-.1 1.7-2.9.2.1a1.7 1.7 0 0 0 1.8-.1l.2-.1h3.4l.1.2a1.7 1.7 0 0 0 1.5 1 1.7 1.7 0 0 0 1.5-1l.1-.2h3.4l.1.2a1.7 1.7 0 0 0 1.5 1l.2-.1 1.7 2.9-.1.1a1.7 1.7 0 0 0-.3 1.9l.1.2v3.4z"/>
-        </svg>
-        SETTINGS
-      </button>
+      <div class="header-buttons">
+
+        <a
+          class="home-button"
+          href="https://doxadenice.github.io/command-center-widgets/home.html"
+        >
+          ⌂ HOME
+        </a>
+
+        <button
+          id="settings-toggle"
+          class="settings-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="connection-panel"
+        >
+          <svg viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.7"
+            stroke-linecap="round" stroke-linejoin="round"
+            aria-hidden="true">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.7 2.9-.2-.1a1.7 1.7 0 0 0-1.8.1l-.2.1h-3.4l-.1-.2a1.7 1.7 0 0 0-1.5-1 1.7 1.7 0 0 0-1.5 1l-.1.2H6l-.1-.2a1.7 1.7 0 0 0-1.5-1l-.2.1-1.7-2.9.1-.1A1.7 1.7 0 0 0 3 14.1l-.1-.2v-3.4l.2-.1a1.7 1.7 0 0 0 1-1.5 1.7 1.7 0 0 0-1-1.5l-.2-.1 1.7-2.9.2.1a1.7 1.7 0 0 0 1.8-.1l.2-.1h3.4l.1.2a1.7 1.7 0 0 0 1.5 1 1.7 1.7 0 0 0 1.5-1l.1-.2h3.4l.1.2a1.7 1.7 0 0 0 1.5 1l.2-.1 1.7 2.9-.1.1a1.7 1.7 0 0 0-.3 1.9l.1.2v3.4z"/>
+          </svg>
+          SETTINGS
+        </button>
+
+      </div>
     </div>
 
     <div id="clock"></div>
