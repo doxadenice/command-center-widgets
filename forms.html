@@ -10,84 +10,282 @@
 * { box-sizing: border-box; }
 
 :root {
-  --ink: #35434a;
-  --muted: #78868b;
-  --blue: #dceaf0;
-  --blue-dark: #8daeba;
-  --sage: #e3ebe2;
-  --cream: #fbfaf6;
-  --white: #ffffff;
-  --border: #e3e7e4;
-  --gold: #d8c7a2;
+  --marble: #E9E1D3;
+  --cream: #F4EFE6;
+  --white: #FFFEFA;
+  --blue: #244B68;
+  --blue-light: #E0EAF0;
+  --olive: #718675;
+  --olive-light: #E5EBE2;
+  --gold: #B99A5B;
+  --terracotta: #B77D68;
+  --ink: #35434A;
+  --muted: #7D8582;
+  --border: #DED7C9;
 }
 
 body {
   margin: 0;
-  padding: 35px 18px 60px;
-  background: var(--cream);
+  padding: 30px 20px 45px;
+  background: var(--marble);
   color: var(--ink);
   font-family: Georgia, "Times New Roman", serif;
 }
 
 .container {
-  max-width: 760px;
-  margin: 0 auto;
+  max-width: 900px;
+  margin: auto;
 }
 
 header {
   text-align: center;
-  margin-bottom: 28px;
+  padding: 12px 0 25px;
 }
 
 .eyebrow {
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 3px;
   font: 11px Arial, sans-serif;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--olive);
 }
 
 h1 {
+  color: var(--blue);
   font-weight: normal;
-  font-size: 34px;
-  margin: 10px 0 8px;
+  font-size: clamp(30px, 5vw, 43px);
+  margin: 12px 0 8px;
 }
 
 .subtitle {
   color: var(--muted);
   font: 13px Arial, sans-serif;
+  letter-spacing: .5px;
 }
 
-.panel {
+.gold-rule {
+  width: 65px;
+  height: 2px;
+  background: var(--gold);
+  margin: 20px auto 0;
+}
+
+/* Settings */
+
+.settings-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.settings-button {
+  border: 1px solid var(--border);
+  background: var(--cream);
+  color: var(--blue);
+  padding: 9px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+  font: 11px Arial, sans-serif;
+  letter-spacing: 1px;
+}
+
+.settings-button:hover {
+  background: var(--white);
+}
+
+.connection {
+  display: none;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 20px;
+}
+
+.connection.open {
+  display: block;
+}
+
+.connection label {
+  display: block;
+  font: 12px Arial, sans-serif;
+  margin-bottom: 7px;
+}
+
+.connection input {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--white);
+}
+
+.connection-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.connection-actions button {
+  padding: 9px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font: 12px Arial, sans-serif;
+}
+
+.save-key {
+  background: var(--blue);
+  color: white;
+}
+
+.clear-key {
+  background: #E8DED4;
+  color: var(--ink);
+}
+
+.key-note {
+  color: var(--muted);
+  font: 11px Arial, sans-serif;
+  margin-top: 9px;
+}
+
+/* Main form selector */
+
+.section-heading {
+  text-align: center;
+  color: var(--blue);
+  font-size: 21px;
+  font-weight: normal;
+  margin: 15px 0 7px;
+}
+
+.section-subtitle {
+  text-align: center;
+  color: var(--muted);
+  font: 12px Arial, sans-serif;
+  margin: 0 0 22px;
+}
+
+.form-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.form-choice {
+  position: relative;
+  min-height: 125px;
+  padding: 19px 15px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  cursor: pointer;
+  text-align: left;
+  transition: transform .18s, box-shadow .18s, border-color .18s;
+  color: var(--blue);
+  background: var(--cream);
+}
+
+.form-choice:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 7px 18px rgba(53,67,74,.09);
+}
+
+.form-choice.active {
+  border: 2px solid var(--gold);
+  box-shadow: 0 4px 14px rgba(53,67,74,.08);
+}
+
+.form-choice.brain { background: #E5EAF0; }
+.form-choice.daily { background: #E6EBE2; }
+.form-choice.ledger { background: #F0E8DA; }
+.form-choice.meals { background: #F1E4DD; }
+
+.choice-icon {
+  display: block;
+  font-size: 25px;
+  margin-bottom: 11px;
+}
+
+.choice-title {
+  display: block;
+  font: 17px Georgia, serif;
+  margin-bottom: 5px;
+}
+
+.choice-description {
+  display: block;
+  font: 11px Arial, sans-serif;
+  color: #68777A;
+  line-height: 1.4;
+}
+
+/* Form panel */
+
+.form-panel {
   background: var(--white);
   border: 1px solid var(--border);
   border-radius: 15px;
-  padding: 26px;
-  box-shadow: 0 5px 20px rgba(50,65,70,.04);
-  margin-bottom: 18px;
+  padding: clamp(20px, 4vw, 32px);
+  box-shadow: 0 5px 20px rgba(53,67,74,.055);
+}
+
+.form-header {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 17px;
+  margin-bottom: 19px;
+}
+
+.form-header h2 {
+  color: var(--blue);
+  font-size: 25px;
+  font-weight: normal;
+  margin: 0 0 7px;
+}
+
+.form-header p {
+  color: var(--muted);
+  font: 12px Arial, sans-serif;
+  margin: 0;
+}
+
+#fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 18px;
+}
+
+.field {
+  min-width: 0;
+}
+
+.field.wide {
+  grid-column: 1 / -1;
 }
 
 label {
   display: block;
-  margin: 18px 0 7px;
-  font: 13px Arial, sans-serif;
-  color: var(--ink);
+  margin: 17px 0 7px;
+  font: 12px Arial, sans-serif;
+  color: var(--blue);
+  letter-spacing: .3px;
 }
 
 input, textarea, select {
-  display: block;
   width: 100%;
   padding: 12px 13px;
   border: 1px solid var(--border);
-  border-radius: 8px;
-  background: #fdfdfb;
+  border-radius: 7px;
+  background: #FDFCFA;
   color: var(--ink);
-  font: 14px Arial, sans-serif;
+  font: 13px Arial, sans-serif;
   outline: none;
 }
 
 input:focus, textarea:focus, select:focus {
-  border-color: var(--blue-dark);
-  box-shadow: 0 0 0 2px rgba(141,174,186,.12);
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(185,154,91,.12);
 }
 
 textarea {
@@ -96,107 +294,95 @@ textarea {
 }
 
 select[multiple] {
-  min-height: 110px;
-}
-
-.field-hint {
-  color: var(--muted);
-  font: 11px Arial, sans-serif;
-  margin-top: 5px;
+  min-height: 105px;
 }
 
 .check-row {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 12px 0;
+  margin: 20px 0 5px;
   font: 13px Arial, sans-serif;
 }
 
 .check-row input {
   width: auto;
-  margin: 0;
-  accent-color: var(--blue-dark);
+  accent-color: var(--olive);
 }
 
-button {
-  border: 0;
-  border-radius: 8px;
-  padding: 13px 20px;
-  cursor: pointer;
-  font: 13px Arial, sans-serif;
+.field-hint {
+  color: var(--muted);
+  font: 10px Arial, sans-serif;
+  margin-top: 6px;
 }
 
-.primary {
-  background: var(--blue);
-  color: #354b55;
+.submit-button {
+  display: block;
   width: 100%;
-  margin-top: 25px;
-  font-weight: bold;
+  margin-top: 27px;
+  padding: 15px;
+  background: var(--blue);
+  color: white;
+  border: 1px solid var(--blue);
+  border-radius: 8px;
+  font: 12px Arial, sans-serif;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .2s;
 }
 
-.primary:hover { background: #cbdfe8; }
-.primary:disabled { opacity: .55; cursor: wait; }
-
-.secondary {
-  background: var(--sage);
-  color: #45564a;
-  margin-top: 10px;
+.submit-button:hover {
+  background: #315D7B;
 }
 
-.top-controls {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
+.submit-button:disabled {
+  opacity: .55;
+  cursor: wait;
 }
 
 .status {
   display: none;
-  padding: 13px 15px;
-  margin-top: 18px;
-  border-radius: 8px;
-  font: 13px Arial, sans-serif;
+  padding: 13px;
+  margin-top: 16px;
+  border-radius: 7px;
+  font: 12px Arial, sans-serif;
   line-height: 1.5;
 }
 
 .status.success {
   display: block;
-  background: #e8f0e7;
-  color: #405a43;
+  background: var(--olive-light);
+  color: #405B45;
 }
 
 .status.error {
   display: block;
-  background: #f6e9e5;
-  color: #824c42;
+  background: #F4E5DF;
+  color: #874C3F;
 }
 
 .status.info {
   display: block;
-  background: #edf3f5;
-  color: #455d68;
+  background: var(--blue-light);
+  color: var(--blue);
 }
 
 footer {
   text-align: center;
   color: var(--muted);
-  font: 11px Arial, sans-serif;
+  font: 10px Arial, sans-serif;
+  letter-spacing: 2px;
   margin-top: 25px;
 }
 
-.section-note {
-  color: var(--muted);
-  font: 12px Arial, sans-serif;
-  line-height: 1.5;
-  margin: 0 0 12px;
-}
-
-.hidden { display: none; }
-
-@media (max-width: 520px) {
-  body { padding: 22px 12px 40px; }
-  .panel { padding: 19px; }
-  h1 { font-size: 29px; }
+@media (max-width: 560px) {
+  body { padding: 18px 12px 35px; }
+  .form-buttons { gap: 9px; }
+  .form-choice { min-height: 115px; padding: 14px 11px; }
+  .choice-title { font-size: 15px; }
+  #fields { grid-template-columns: 1fr; }
+  .field.wide { grid-column: auto; }
 }
 </style>
 </head>
@@ -206,66 +392,134 @@ footer {
 
 <header>
   <div class="eyebrow">Your Personal Workspace</div>
-  <h1>Quick Entry</h1>
-  <div class="subtitle">Capture it. Record it. Keep moving.</div>
+  <h1>Command Center</h1>
+  <div class="subtitle">A place to capture, reflect, organize and plan.</div>
+  <div class="gold-rule"></div>
 </header>
 
-<div class="panel">
-  <div class="top-controls">
-    <div>
-      <label for="apiKey">Widget Access Key</label>
-      <input id="apiKey" type="password" autocomplete="off"
-        placeholder="Enter your existing widget access key">
-      <div class="field-hint">Your key is saved only in this browser.</div>
-      <button class="secondary" type="button" id="saveKey">Save Key</button>
-    </div>
+<div class="settings-bar">
+  <button class="settings-button" id="settingsToggle" type="button">
+    ⚙ SETTINGS
+  </button>
+</div>
 
-    <div>
-      <label for="resource">Choose a form</label>
-      <select id="resource">
-        <option value="brain-dump">Brain Dump</option>
-        <option value="daily-log">Daily Log</option>
-        <option value="project-ledger">Financial Transactions / Project Ledger</option>
-        <option value="meal-planner">Meal Planning</option>
-      </select>
-    </div>
+<div class="connection" id="connectionPanel">
+  <label for="apiKey">Widget Access Key</label>
+  <input id="apiKey" type="password" autocomplete="off"
+    placeholder="Enter your existing Widget Access Key">
+
+  <div class="connection-actions">
+    <button class="save-key" id="saveKey" type="button">Save Key</button>
+    <button class="clear-key" id="clearKey" type="button">Clear Key</button>
+  </div>
+
+  <div class="key-note">
+    This is the same saved key used by your read-only dashboard.
+    Your Notion API token remains securely stored in Cloudflare.
   </div>
 </div>
 
-<div class="panel">
-  <p class="section-note">
-    Fill in whatever is useful. Every field is optional.
-  </p>
+<h2 class="section-heading">What would you like to enter?</h2>
+<p class="section-subtitle">Choose a destination to get started.</p>
+
+<div class="form-buttons">
+
+  <button class="form-choice brain active" data-resource="brain-dump"
+    type="button">
+    <span class="choice-icon">✧</span>
+    <span class="choice-title">Brain Dump</span>
+    <span class="choice-description">Capture thoughts, ideas and tasks.</span>
+  </button>
+
+  <button class="form-choice daily" data-resource="daily-log"
+    type="button">
+    <span class="choice-icon">☼</span>
+    <span class="choice-title">Daily Log</span>
+    <span class="choice-description">Reflect on the day and record progress.</span>
+  </button>
+
+  <button class="form-choice ledger" data-resource="project-ledger"
+    type="button">
+    <span class="choice-icon">◇</span>
+    <span class="choice-title">Project Ledger</span>
+    <span class="choice-description">Track transactions, savings and payments.</span>
+  </button>
+
+  <button class="form-choice meals" data-resource="meal-planner"
+    type="button">
+    <span class="choice-icon">❋</span>
+    <span class="choice-title">Meal Planning</span>
+    <span class="choice-description">Plan meals and keep recipe notes.</span>
+  </button>
+
+</div>
+
+<div class="form-panel">
+
+  <div class="form-header">
+    <h2 id="formTitle">Brain Dump</h2>
+    <p id="formDescription">Get it out of your head and into your workspace.</p>
+  </div>
 
   <form id="entryForm">
     <div id="fields">
-      <p class="section-note">Loading form fields…</p>
+      <p class="field-hint">Loading form fields…</p>
     </div>
 
-    <button class="primary" id="submitButton" type="submit">
+    <button class="submit-button" id="submitButton" type="submit">
       Save Entry
     </button>
   </form>
 
   <div id="status" class="status" role="status"></div>
+
 </div>
 
-<footer>COMMAND CENTER · QUICK CAPTURE</footer>
+<footer>COMMAND CENTER · QUICK ENTRY</footer>
+
 </div>
 
 <script>
 const API_BASE = "https://command-center-api.doxadenice.workers.dev";
+const STORAGE_KEY = "commandCenterWidgetKey";
 
-const resourceSelect = document.getElementById("resource");
+const resourceSelect = document.querySelectorAll(".form-choice");
 const form = document.getElementById("entryForm");
 const fieldsContainer = document.getElementById("fields");
 const statusBox = document.getElementById("status");
 const keyInput = document.getElementById("apiKey");
 const submitButton = document.getElementById("submitButton");
+const settingsPanel = document.getElementById("connectionPanel");
 
-keyInput.value = localStorage.getItem("ccWidgetKey") || "";
+let currentResource = "brain-dump";
 
-document.getElementById("saveKey").addEventListener("click", () => {
+const formInfo = {
+  "brain-dump": {
+    title: "Brain Dump",
+    description: "Get it out of your head and into your workspace."
+  },
+  "daily-log": {
+    title: "Daily Log",
+    description: "Pause, reflect and record what matters today."
+  },
+  "project-ledger": {
+    title: "Project Ledger",
+    description: "Keep track of money, projects and progress."
+  },
+  "meal-planner": {
+    title: "Meal Planning",
+    description: "Make a plan for the table."
+  }
+};
+
+// Use the same saved key as the read-only dashboard.
+keyInput.value = localStorage.getItem(STORAGE_KEY) || "";
+
+document.getElementById("settingsToggle").addEventListener("click", () => {
+  settingsPanel.classList.toggle("open");
+});
+
+document.getElementById("saveKey").addEventListener("click", async () => {
   const key = keyInput.value.trim();
 
   if (!key) {
@@ -273,8 +527,15 @@ document.getElementById("saveKey").addEventListener("click", () => {
     return;
   }
 
-  localStorage.setItem("ccWidgetKey", key);
-  showStatus("Access key saved in this browser.", "success");
+  localStorage.setItem(STORAGE_KEY, key);
+  showStatus("Access key saved. Checking connection…", "info");
+  await loadForm();
+});
+
+document.getElementById("clearKey").addEventListener("click", () => {
+  localStorage.removeItem(STORAGE_KEY);
+  keyInput.value = "";
+  showStatus("Saved access key cleared from this browser.", "info");
 });
 
 function showStatus(message, type) {
@@ -288,10 +549,10 @@ function clearStatus() {
 }
 
 async function apiRequest(resource, method = "GET", body = null) {
-  const key = keyInput.value.trim();
+  const key = localStorage.getItem(STORAGE_KEY) || "";
 
   if (!key) {
-    throw new Error("Enter your Widget Access Key first.");
+    throw new Error("Open Settings and enter your Widget Access Key.");
   }
 
   const url = new URL(API_BASE);
@@ -323,33 +584,29 @@ async function apiRequest(resource, method = "GET", body = null) {
   return data;
 }
 
-function addLabel(container, name) {
-  const label = document.createElement("label");
-  label.textContent = name;
-  container.appendChild(label);
-}
-
 function createField(name, property) {
   const wrapper = document.createElement("div");
-  const type = property.type;
+  wrapper.className = "field";
 
-  addLabel(wrapper, name);
+  const type = property.type;
+  const lower = name.toLowerCase();
+
+  const longTextFields = [
+    "notes", "gratitude", "accomplishments", "challenges",
+    "ingredients", "intention", "carry", "thought",
+    "priority", "description"
+  ];
+
+  const isLongText = longTextFields.some(word => lower.includes(word));
+
+  const label = document.createElement("label");
+  label.textContent = name;
+  wrapper.appendChild(label);
 
   let input;
 
   if (type === "title" || type === "rich_text") {
-    input = document.createElement(
-      name.toLowerCase().includes("notes") ||
-      name.toLowerCase().includes("gratitude") ||
-      name.toLowerCase().includes("accomplishments") ||
-      name.toLowerCase().includes("challenges") ||
-      name.toLowerCase().includes("ingredients") ||
-      name.toLowerCase().includes("intention") ||
-      name.toLowerCase().includes("carry") ||
-      name.toLowerCase().includes("thought")
-        ? "textarea"
-        : "input"
-    );
+    input = document.createElement(isLongText ? "textarea" : "input");
 
     if (input.tagName === "INPUT") {
       input.type = "text";
@@ -392,15 +649,16 @@ function createField(name, property) {
 
     const hint = document.createElement("div");
     hint.className = "field-hint";
-    hint.textContent = "You can select more than one option.";
+    hint.textContent = "Select more than one option if needed.";
     wrapper.appendChild(hint);
 
   } else if (type === "checkbox") {
+    const row = document.createElement("div");
+    row.className = "check-row";
+
     input = document.createElement("input");
     input.type = "checkbox";
 
-    const row = document.createElement("div");
-    row.className = "check-row";
     row.appendChild(input);
     row.appendChild(document.createTextNode("Yes"));
     wrapper.appendChild(row);
@@ -421,11 +679,11 @@ function createField(name, property) {
   } else if (type === "relation") {
     input = document.createElement("input");
     input.type = "text";
-    input.placeholder = "Paste Notion page ID(s), separated by commas";
+    input.placeholder = "Notion page ID(s), separated by commas";
 
     const hint = document.createElement("div");
     hint.className = "field-hint";
-    hint.textContent = "Relation fields need existing Notion page IDs.";
+    hint.textContent = "Relation fields require existing Notion page IDs.";
     wrapper.appendChild(hint);
 
   } else {
@@ -438,25 +696,34 @@ function createField(name, property) {
     wrapper.appendChild(input);
   }
 
+  if (type === "title" || type === "rich_text") {
+    if (isLongText) wrapper.classList.add("wide");
+  }
+
+  if (type === "multi_select" || type === "relation") {
+    wrapper.classList.add("wide");
+  }
+
   return wrapper;
 }
 
 async function loadForm() {
   clearStatus();
 
-  const resource = resourceSelect.value;
-  fieldsContainer.innerHTML = "<p class='section-note'>Loading fields…</p>";
+  fieldsContainer.innerHTML =
+    "<p class='field-hint'>Loading your Notion fields…</p>";
+
   submitButton.disabled = true;
 
   try {
-    const data = await apiRequest(resource);
+    const data = await apiRequest(currentResource);
     fieldsContainer.innerHTML = "";
 
     const properties = data.properties || {};
     const names = Object.keys(properties);
 
     if (!names.length) {
-      throw new Error("No supported properties were found for this database.");
+      throw new Error("No supported properties were found.");
     }
 
     names.forEach(name => {
@@ -476,13 +743,28 @@ async function loadForm() {
   }
 }
 
-resourceSelect.addEventListener("change", loadForm);
+resourceSelect.forEach(button => {
+  button.addEventListener("click", () => {
+    resourceSelect.forEach(item => item.classList.remove("active"));
+    button.classList.add("active");
+
+    currentResource = button.dataset.resource;
+
+    document.getElementById("formTitle").textContent =
+      formInfo[currentResource].title;
+
+    document.getElementById("formDescription").textContent =
+      formInfo[currentResource].description;
+
+    form.reset();
+    loadForm();
+  });
+});
 
 form.addEventListener("submit", async event => {
   event.preventDefault();
   clearStatus();
 
-  const resource = resourceSelect.value;
   const body = {};
 
   fieldsContainer.querySelectorAll("[name]").forEach(input => {
@@ -507,9 +789,13 @@ form.addEventListener("submit", async event => {
   submitButton.textContent = "Saving…";
 
   try {
-    await apiRequest(resource, "POST", body);
+    await apiRequest(currentResource, "POST", body);
 
-    showStatus("Your entry was saved successfully to Notion.", "success");
+    showStatus(
+      "Your entry has been saved successfully to Notion.",
+      "success"
+    );
+
     form.reset();
 
   } catch (error) {
