@@ -1,0 +1,527 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Command Center | Quick Entry</title>
+
+<style>
+* { box-sizing: border-box; }
+
+:root {
+  --ink: #35434a;
+  --muted: #78868b;
+  --blue: #dceaf0;
+  --blue-dark: #8daeba;
+  --sage: #e3ebe2;
+  --cream: #fbfaf6;
+  --white: #ffffff;
+  --border: #e3e7e4;
+  --gold: #d8c7a2;
+}
+
+body {
+  margin: 0;
+  padding: 35px 18px 60px;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.container {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.eyebrow {
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font: 11px Arial, sans-serif;
+}
+
+h1 {
+  font-weight: normal;
+  font-size: 34px;
+  margin: 10px 0 8px;
+}
+
+.subtitle {
+  color: var(--muted);
+  font: 13px Arial, sans-serif;
+}
+
+.panel {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  padding: 26px;
+  box-shadow: 0 5px 20px rgba(50,65,70,.04);
+  margin-bottom: 18px;
+}
+
+label {
+  display: block;
+  margin: 18px 0 7px;
+  font: 13px Arial, sans-serif;
+  color: var(--ink);
+}
+
+input, textarea, select {
+  display: block;
+  width: 100%;
+  padding: 12px 13px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fdfdfb;
+  color: var(--ink);
+  font: 14px Arial, sans-serif;
+  outline: none;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--blue-dark);
+  box-shadow: 0 0 0 2px rgba(141,174,186,.12);
+}
+
+textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+select[multiple] {
+  min-height: 110px;
+}
+
+.field-hint {
+  color: var(--muted);
+  font: 11px Arial, sans-serif;
+  margin-top: 5px;
+}
+
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0;
+  font: 13px Arial, sans-serif;
+}
+
+.check-row input {
+  width: auto;
+  margin: 0;
+  accent-color: var(--blue-dark);
+}
+
+button {
+  border: 0;
+  border-radius: 8px;
+  padding: 13px 20px;
+  cursor: pointer;
+  font: 13px Arial, sans-serif;
+}
+
+.primary {
+  background: var(--blue);
+  color: #354b55;
+  width: 100%;
+  margin-top: 25px;
+  font-weight: bold;
+}
+
+.primary:hover { background: #cbdfe8; }
+.primary:disabled { opacity: .55; cursor: wait; }
+
+.secondary {
+  background: var(--sage);
+  color: #45564a;
+  margin-top: 10px;
+}
+
+.top-controls {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.status {
+  display: none;
+  padding: 13px 15px;
+  margin-top: 18px;
+  border-radius: 8px;
+  font: 13px Arial, sans-serif;
+  line-height: 1.5;
+}
+
+.status.success {
+  display: block;
+  background: #e8f0e7;
+  color: #405a43;
+}
+
+.status.error {
+  display: block;
+  background: #f6e9e5;
+  color: #824c42;
+}
+
+.status.info {
+  display: block;
+  background: #edf3f5;
+  color: #455d68;
+}
+
+footer {
+  text-align: center;
+  color: var(--muted);
+  font: 11px Arial, sans-serif;
+  margin-top: 25px;
+}
+
+.section-note {
+  color: var(--muted);
+  font: 12px Arial, sans-serif;
+  line-height: 1.5;
+  margin: 0 0 12px;
+}
+
+.hidden { display: none; }
+
+@media (max-width: 520px) {
+  body { padding: 22px 12px 40px; }
+  .panel { padding: 19px; }
+  h1 { font-size: 29px; }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+  <div class="eyebrow">Your Personal Workspace</div>
+  <h1>Quick Entry</h1>
+  <div class="subtitle">Capture it. Record it. Keep moving.</div>
+</header>
+
+<div class="panel">
+  <div class="top-controls">
+    <div>
+      <label for="apiKey">Widget Access Key</label>
+      <input id="apiKey" type="password" autocomplete="off"
+        placeholder="Enter your existing widget access key">
+      <div class="field-hint">Your key is saved only in this browser.</div>
+      <button class="secondary" type="button" id="saveKey">Save Key</button>
+    </div>
+
+    <div>
+      <label for="resource">Choose a form</label>
+      <select id="resource">
+        <option value="brain-dump">Brain Dump</option>
+        <option value="daily-log">Daily Log</option>
+        <option value="project-ledger">Financial Transactions / Project Ledger</option>
+        <option value="meal-planner">Meal Planning</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <p class="section-note">
+    Fill in whatever is useful. Every field is optional.
+  </p>
+
+  <form id="entryForm">
+    <div id="fields">
+      <p class="section-note">Loading form fields…</p>
+    </div>
+
+    <button class="primary" id="submitButton" type="submit">
+      Save Entry
+    </button>
+  </form>
+
+  <div id="status" class="status" role="status"></div>
+</div>
+
+<footer>COMMAND CENTER · QUICK CAPTURE</footer>
+</div>
+
+<script>
+const API_BASE = "https://command-center-api.doxadenice.workers.dev";
+
+const resourceSelect = document.getElementById("resource");
+const form = document.getElementById("entryForm");
+const fieldsContainer = document.getElementById("fields");
+const statusBox = document.getElementById("status");
+const keyInput = document.getElementById("apiKey");
+const submitButton = document.getElementById("submitButton");
+
+keyInput.value = localStorage.getItem("ccWidgetKey") || "";
+
+document.getElementById("saveKey").addEventListener("click", () => {
+  const key = keyInput.value.trim();
+
+  if (!key) {
+    showStatus("Enter your Widget Access Key first.", "error");
+    return;
+  }
+
+  localStorage.setItem("ccWidgetKey", key);
+  showStatus("Access key saved in this browser.", "success");
+});
+
+function showStatus(message, type) {
+  statusBox.className = "status " + type;
+  statusBox.textContent = message;
+}
+
+function clearStatus() {
+  statusBox.className = "status";
+  statusBox.textContent = "";
+}
+
+async function apiRequest(resource, method = "GET", body = null) {
+  const key = keyInput.value.trim();
+
+  if (!key) {
+    throw new Error("Enter your Widget Access Key first.");
+  }
+
+  const url = new URL(API_BASE);
+  url.searchParams.set("resource", resource);
+
+  if (method === "GET") {
+    url.searchParams.set("action", "schema");
+  }
+
+  const options = {
+    method,
+    headers: {
+      "X-Widget-Key": key
+    }
+  };
+
+  if (body !== null) {
+    options.headers["Content-Type"] = "application/json";
+    options.body = JSON.stringify(body);
+  }
+
+  const response = await fetch(url.toString(), options);
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.error || "The request could not be completed.");
+  }
+
+  return data;
+}
+
+function addLabel(container, name) {
+  const label = document.createElement("label");
+  label.textContent = name;
+  container.appendChild(label);
+}
+
+function createField(name, property) {
+  const wrapper = document.createElement("div");
+  const type = property.type;
+
+  addLabel(wrapper, name);
+
+  let input;
+
+  if (type === "title" || type === "rich_text") {
+    input = document.createElement(
+      name.toLowerCase().includes("notes") ||
+      name.toLowerCase().includes("gratitude") ||
+      name.toLowerCase().includes("accomplishments") ||
+      name.toLowerCase().includes("challenges") ||
+      name.toLowerCase().includes("ingredients") ||
+      name.toLowerCase().includes("intention") ||
+      name.toLowerCase().includes("carry") ||
+      name.toLowerCase().includes("thought")
+        ? "textarea"
+        : "input"
+    );
+
+    if (input.tagName === "INPUT") {
+      input.type = "text";
+    }
+
+  } else if (type === "date") {
+    input = document.createElement("input");
+    input.type = "date";
+
+  } else if (type === "number") {
+    input = document.createElement("input");
+    input.type = "number";
+    input.step = "any";
+
+  } else if (type === "select" || type === "status") {
+    input = document.createElement("select");
+
+    const blank = document.createElement("option");
+    blank.value = "";
+    blank.textContent = "Choose an option";
+    input.appendChild(blank);
+
+    (property.options || []).forEach(option => {
+      const item = document.createElement("option");
+      item.value = option;
+      item.textContent = option;
+      input.appendChild(item);
+    });
+
+  } else if (type === "multi_select") {
+    input = document.createElement("select");
+    input.multiple = true;
+
+    (property.options || []).forEach(option => {
+      const item = document.createElement("option");
+      item.value = option;
+      item.textContent = option;
+      input.appendChild(item);
+    });
+
+    const hint = document.createElement("div");
+    hint.className = "field-hint";
+    hint.textContent = "You can select more than one option.";
+    wrapper.appendChild(hint);
+
+  } else if (type === "checkbox") {
+    input = document.createElement("input");
+    input.type = "checkbox";
+
+    const row = document.createElement("div");
+    row.className = "check-row";
+    row.appendChild(input);
+    row.appendChild(document.createTextNode("Yes"));
+    wrapper.appendChild(row);
+
+  } else if (type === "url") {
+    input = document.createElement("input");
+    input.type = "url";
+    input.placeholder = "https://";
+
+  } else if (type === "email") {
+    input = document.createElement("input");
+    input.type = "email";
+
+  } else if (type === "phone_number") {
+    input = document.createElement("input");
+    input.type = "tel";
+
+  } else if (type === "relation") {
+    input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = "Paste Notion page ID(s), separated by commas";
+
+    const hint = document.createElement("div");
+    hint.className = "field-hint";
+    hint.textContent = "Relation fields need existing Notion page IDs.";
+    wrapper.appendChild(hint);
+
+  } else {
+    return null;
+  }
+
+  input.name = name;
+
+  if (input.type !== "checkbox") {
+    wrapper.appendChild(input);
+  }
+
+  return wrapper;
+}
+
+async function loadForm() {
+  clearStatus();
+
+  const resource = resourceSelect.value;
+  fieldsContainer.innerHTML = "<p class='section-note'>Loading fields…</p>";
+  submitButton.disabled = true;
+
+  try {
+    const data = await apiRequest(resource);
+    fieldsContainer.innerHTML = "";
+
+    const properties = data.properties || {};
+    const names = Object.keys(properties);
+
+    if (!names.length) {
+      throw new Error("No supported properties were found for this database.");
+    }
+
+    names.forEach(name => {
+      const field = createField(name, properties[name]);
+      if (field) fieldsContainer.appendChild(field);
+    });
+
+    if (!fieldsContainer.children.length) {
+      throw new Error("No supported form fields were found.");
+    }
+
+    submitButton.disabled = false;
+
+  } catch (error) {
+    fieldsContainer.innerHTML = "";
+    showStatus(error.message, "error");
+  }
+}
+
+resourceSelect.addEventListener("change", loadForm);
+
+form.addEventListener("submit", async event => {
+  event.preventDefault();
+  clearStatus();
+
+  const resource = resourceSelect.value;
+  const body = {};
+
+  fieldsContainer.querySelectorAll("[name]").forEach(input => {
+    if (input.type === "checkbox") {
+      if (input.checked) body[input.name] = true;
+      return;
+    }
+
+    if (input.tagName === "SELECT" && input.multiple) {
+      const selected = Array.from(input.selectedOptions)
+        .map(option => option.value);
+
+      if (selected.length) body[input.name] = selected;
+      return;
+    }
+
+    const value = input.value.trim();
+    if (value !== "") body[input.name] = value;
+  });
+
+  submitButton.disabled = true;
+  submitButton.textContent = "Saving…";
+
+  try {
+    await apiRequest(resource, "POST", body);
+
+    showStatus("Your entry was saved successfully to Notion.", "success");
+    form.reset();
+
+  } catch (error) {
+    showStatus(error.message, "error");
+
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = "Save Entry";
+  }
+});
+
+loadForm();
+</script>
+</body>
+</html>
