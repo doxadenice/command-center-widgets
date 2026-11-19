@@ -1,0 +1,901 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Command Center | Meal Planning</title>
+
+<style>
+* { box-sizing: border-box; }
+
+:root {
+  --marble: #E9E1D3;
+  --cream: #F4EFE6;
+  --white: #FFFEFA;
+  --blue: #244B68;
+  --blue-light: #E0EAF0;
+  --olive: #718675;
+  --olive-light: #E5EBE2;
+  --gold: #B99A5B;
+  --terracotta: #B77D68;
+  --ink: #35434A;
+  --muted: #7D8582;
+  --border: #DED7C9;
+}
+
+body {
+  margin: 0;
+  padding: 25px;
+  background: var(--marble);
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.container {
+  max-width: 1450px;
+  margin: auto;
+}
+
+header {
+  text-align: center;
+  padding: 15px 0 25px;
+}
+
+.eyebrow {
+  font: 11px Arial, sans-serif;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--olive);
+}
+
+h1 {
+  color: var(--blue);
+  font-size: clamp(32px, 5vw, 46px);
+  font-weight: normal;
+  margin: 10px 0 7px;
+}
+
+.subtitle {
+  color: var(--muted);
+  font: 13px Arial, sans-serif;
+}
+
+.gold-rule {
+  width: 65px;
+  height: 2px;
+  background: var(--gold);
+  margin: 20px auto 0;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.topbar-left, .topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+button, select, input {
+  font-family: Arial, sans-serif;
+}
+
+.control-button {
+  border: 1px solid var(--border);
+  background: var(--cream);
+  color: var(--blue);
+  border-radius: 20px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 11px;
+  letter-spacing: .5px;
+}
+
+.control-button:hover {
+  background: var(--white);
+}
+
+.control-button.active {
+  background: var(--blue);
+  color: white;
+  border-color: var(--blue);
+}
+
+.settings-panel {
+  display: none;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 18px;
+}
+
+.settings-panel.open { display: block; }
+
+.settings-panel label {
+  display: block;
+  color: var(--blue);
+  font: 12px Arial, sans-serif;
+  margin-bottom: 7px;
+}
+
+.settings-panel input {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--white);
+}
+
+.settings-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.settings-actions button {
+  padding: 9px 14px;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.save-key { background: var(--blue); color: white; }
+.clear-key { background: #E8DED4; color: var(--ink); }
+
+.settings-note {
+  color: var(--muted);
+  font: 11px Arial, sans-serif;
+  margin-top: 9px;
+}
+
+.filters {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.filters select, .filters input {
+  padding: 11px 13px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--ink);
+  font-size: 12px;
+}
+
+.filters input {
+  flex: 1;
+  min-width: 170px;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(260px, 350px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.meal-list, .recipe-panel {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(53,67,74,.055);
+}
+
+.meal-list {
+  padding: 18px;
+  max-height: 850px;
+  overflow-y: auto;
+}
+
+.list-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 13px;
+  margin-bottom: 12px;
+}
+
+.list-heading h2 {
+  color: var(--blue);
+  font-weight: normal;
+  font-size: 21px;
+  margin: 0;
+}
+
+.count {
+  font: 11px Arial, sans-serif;
+  color: var(--muted);
+}
+
+.meal-card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 15px;
+  margin-bottom: 9px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--cream);
+  color: var(--ink);
+  cursor: pointer;
+  transition: .18s;
+}
+
+.meal-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(53,67,74,.08);
+}
+
+.meal-card.active {
+  border: 2px solid var(--gold);
+  background: #F8F3E9;
+}
+
+.meal-card-title {
+  display: block;
+  font: 17px Georgia, serif;
+  color: var(--blue);
+  margin-bottom: 7px;
+}
+
+.meal-card-meta {
+  display: block;
+  color: var(--muted);
+  font: 11px Arial, sans-serif;
+  line-height: 1.6;
+}
+
+.meal-type {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 4px 9px;
+  border-radius: 20px;
+  background: var(--olive-light);
+  color: #52684A;
+  font: 10px Arial, sans-serif;
+}
+
+.recipe-panel {
+  min-height: 540px;
+  padding: clamp(20px, 4vw, 38px);
+}
+
+.recipe-top {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 20px;
+  margin-bottom: 22px;
+}
+
+.recipe-eyebrow {
+  color: var(--olive);
+  font: 10px Arial, sans-serif;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.recipe-title {
+  color: var(--blue);
+  font-size: clamp(27px, 4vw, 38px);
+  font-weight: normal;
+  line-height: 1.2;
+  margin: 0 0 12px;
+  overflow-wrap: anywhere;
+}
+
+.recipe-meta {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  color: var(--muted);
+  font: 11px Arial, sans-serif;
+}
+
+.meta-pill {
+  background: var(--blue-light);
+  color: var(--blue);
+  padding: 6px 10px;
+  border-radius: 20px;
+}
+
+.recipe-content {
+  display: grid;
+  grid-template-columns: minmax(220px, .8fr) minmax(0, 1.2fr);
+  gap: 24px;
+}
+
+.recipe-section h3 {
+  color: var(--blue);
+  font-weight: normal;
+  font-size: 22px;
+  margin: 0 0 14px;
+}
+
+.recipe-section {
+  min-width: 0;
+}
+
+.recipe-text {
+  color: var(--ink);
+  font: 14px/1.85 Arial, sans-serif;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.ingredients-section {
+  background: #F1F3ED;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.instructions-section {
+  padding: 5px 5px 15px;
+}
+
+.recipe-link {
+  display: inline-block;
+  margin-top: 22px;
+  padding: 11px 16px;
+  border-radius: 7px;
+  background: var(--blue);
+  color: white;
+  text-decoration: none;
+  font: 11px Arial, sans-serif;
+  letter-spacing: .7px;
+}
+
+.recipe-link:hover { background: #315D7B; }
+
+.notes-section {
+  border-top: 1px solid var(--border);
+  margin-top: 28px;
+  padding-top: 22px;
+}
+
+.notes-section h3 {
+  color: var(--blue);
+  font-weight: normal;
+  font-size: 21px;
+  margin: 0 0 12px;
+}
+
+.empty-state {
+  padding: 45px 15px;
+  text-align: center;
+  color: var(--muted);
+  font: 13px/1.7 Arial, sans-serif;
+}
+
+.empty-state strong {
+  display: block;
+  color: var(--blue);
+  font: 22px Georgia, serif;
+  margin-bottom: 10px;
+}
+
+.status {
+  display: none;
+  padding: 13px;
+  margin: 12px 0;
+  border-radius: 7px;
+  font: 12px Arial, sans-serif;
+  line-height: 1.5;
+}
+
+.status.error {
+  display: block;
+  background: #F4E5DF;
+  color: #874C3F;
+}
+
+.status.info {
+  display: block;
+  background: var(--blue-light);
+  color: var(--blue);
+}
+
+.status.success {
+  display: block;
+  background: var(--olive-light);
+  color: #405B45;
+}
+
+footer {
+  text-align: center;
+  color: var(--muted);
+  font: 10px Arial, sans-serif;
+  letter-spacing: 2px;
+  margin-top: 25px;
+}
+
+@media (max-width: 800px) {
+  body { padding: 18px 12px 35px; }
+  .workspace { grid-template-columns: 1fr; }
+  .meal-list { max-height: 350px; }
+  .recipe-content { grid-template-columns: 1fr; }
+  .recipe-panel { min-height: 400px; }
+}
+
+@media (max-width: 480px) {
+  .topbar { align-items: stretch; }
+  .topbar-left, .topbar-right { width: 100%; }
+  .topbar-right button { flex: 1; }
+  .filters select { flex: 1; }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+  <div class="eyebrow">Your Personal Workspace</div>
+  <h1>At the Table</h1>
+  <div class="subtitle">A thoughtful place for meals, recipes and the pleasure of cooking.</div>
+  <div class="gold-rule"></div>
+</header>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="control-button" id="todayButton" type="button">↻ Refresh</button>
+    <span class="count" id="lastUpdated">Connecting to your kitchen…</span>
+  </div>
+  <div class="topbar-right">
+    <button class="control-button" id="settingsToggle" type="button">⚙ Settings</button>
+  </div>
+</div>
+
+<div class="settings-panel" id="settingsPanel">
+  <label for="apiKey">Widget Access Key</label>
+  <input id="apiKey" type="password" autocomplete="off"
+    placeholder="Enter your existing Widget Access Key">
+  <div class="settings-actions">
+    <button class="save-key" id="saveKey" type="button">Save Key</button>
+    <button class="clear-key" id="clearKey" type="button">Clear Key</button>
+  </div>
+  <div class="settings-note">
+    Uses the same saved key as your Command Center and Quick Entry widgets.
+    Your Notion API token stays securely in Cloudflare.
+  </div>
+</div>
+
+<div id="status" class="status" role="status"></div>
+
+<div class="filters">
+  <select id="mealTypeFilter" aria-label="Filter by meal type">
+    <option value="all">All meals</option>
+    <option value="Breakfast">Breakfast</option>
+    <option value="Lunch">Lunch</option>
+    <option value="Dinner">Dinner</option>
+    <option value="Snack">Snack</option>
+  </select>
+
+  <select id="dateFilter" aria-label="Filter by date">
+    <option value="all">All dates</option>
+    <option value="today">Today</option>
+    <option value="week">Next 7 days</option>
+    <option value="future">Upcoming</option>
+    <option value="past">Past meals</option>
+  </select>
+
+  <input id="searchInput" type="search"
+    placeholder="Search meals or ingredients…">
+</div>
+
+<div class="workspace">
+
+  <aside class="meal-list">
+    <div class="list-heading">
+      <h2>Your Meals</h2>
+      <span class="count" id="mealCount">0 meals</span>
+    </div>
+    <div id="mealCards">
+      <div class="empty-state">Loading your meal plan…</div>
+    </div>
+  </aside>
+
+  <main class="recipe-panel" id="recipePanel">
+    <div class="empty-state">
+      <strong>Welcome to At the Table</strong>
+      Your recipes will appear here. Select a meal to see its ingredients,
+      instructions and notes together.
+    </div>
+  </main>
+
+</div>
+
+<footer>COMMAND CENTER · AT THE TABLE</footer>
+</div>
+
+<script>
+const API_BASE = "https://command-center-api.doxadenice.workers.dev";
+const STORAGE_KEY = "commandCenterWidgetKey";
+
+const keyInput = document.getElementById("apiKey");
+const statusBox = document.getElementById("status");
+const mealCards = document.getElementById("mealCards");
+const recipePanel = document.getElementById("recipePanel");
+
+let meals = [];
+let selectedMealId = null;
+
+keyInput.value = localStorage.getItem(STORAGE_KEY) || "";
+
+document.getElementById("settingsToggle").addEventListener("click", () => {
+  document.getElementById("settingsPanel").classList.toggle("open");
+});
+
+document.getElementById("saveKey").addEventListener("click", async () => {
+  const key = keyInput.value.trim();
+  if (!key) {
+    showStatus("Enter your Widget Access Key first.", "error");
+    return;
+  }
+  localStorage.setItem(STORAGE_KEY, key);
+  await loadMeals();
+});
+
+document.getElementById("clearKey").addEventListener("click", () => {
+  localStorage.removeItem(STORAGE_KEY);
+  keyInput.value = "";
+  meals = [];
+  selectedMealId = null;
+  renderMeals();
+  showStatus("Saved access key cleared from this browser.", "info");
+});
+
+document.getElementById("todayButton").addEventListener("click", loadMeals);
+document.getElementById("mealTypeFilter").addEventListener("change", renderMeals);
+document.getElementById("dateFilter").addEventListener("change", renderMeals);
+document.getElementById("searchInput").addEventListener("input", renderMeals);
+
+function showStatus(message, type) {
+  statusBox.className = "status " + type;
+  statusBox.textContent = message;
+}
+
+function clearStatus() {
+  statusBox.className = "status";
+  statusBox.textContent = "";
+}
+
+async function apiRequest(resource) {
+  const key = localStorage.getItem(STORAGE_KEY) || "";
+  if (!key) {
+    throw new Error("Open Settings and enter your existing Widget Access Key.");
+  }
+
+  const url = new URL(API_BASE);
+  url.searchParams.set("resource", resource);
+
+  const response = await fetch(url.toString(), {
+    method: "GET",
+    headers: { "X-Widget-Key": key }
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.error || "Could not retrieve your meals.");
+  }
+
+  return data;
+}
+
+/* Read Notion property values safely. */
+
+function getProperty(page, name) {
+  const properties = page.properties || {};
+  const property = properties[name];
+
+  if (!property) return "";
+
+  if (property.type === "title" || property.title) {
+    return (property.title || []).map(x => x.plain_text || x.text?.content || "").join("");
+  }
+
+  if (property.type === "rich_text" || property.rich_text) {
+    return (property.rich_text || []).map(x => x.plain_text || x.text?.content || "").join("");
+  }
+
+  if (property.type === "date" || property.date) {
+    return property.date?.start || "";
+  }
+
+  if (property.type === "select" || property.select) {
+    return property.select?.name || "";
+  }
+
+  if (property.type === "status" || property.status) {
+    return property.status?.name || "";
+  }
+
+  if (property.type === "url" || property.url) {
+    return property.url || "";
+  }
+
+  if (property.type === "number") {
+    return property.number ?? "";
+  }
+
+  if (property.type === "checkbox") {
+    return property.checkbox ? "Yes" : "No";
+  }
+
+  if (property.type === "multi_select" || property.multi_select) {
+    return (property.multi_select || []).map(x => x.name).join(", ");
+  }
+
+  return "";
+}
+
+function getMealValue(page, name) {
+  // Also supports already simplified property values if returned by the Worker.
+  const direct = page[name];
+  if (direct !== undefined && direct !== null) {
+    if (typeof direct === "string" || typeof direct === "number") return String(direct);
+  }
+  return String(getProperty(page, name) ?? "");
+}
+
+function getMealTitle(page) {
+  return getMealValue(page, "Planned Meal") ||
+    getMealValue(page, "Name") ||
+    getMealValue(page, "Meal") ||
+    "Untitled Meal";
+}
+
+function getMealDate(meal) {
+  return meal.date ? new Date(meal.date + "T12:00:00") : null;
+}
+
+function formatDate(dateString) {
+  if (!dateString) return "Date not set";
+  const date = new Date(dateString + "T12:00:00");
+  if (isNaN(date)) return dateString;
+  return date.toLocaleDateString(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  });
+}
+
+function extractMeals(data) {
+  let rows = data.results || data.entries || data.items ||
+    data.data?.results || data.data?.entries || [];
+
+  if (!Array.isArray(rows) && Array.isArray(data.data)) rows = data.data;
+  if (!Array.isArray(rows)) rows = [];
+
+  return rows.map(page => ({
+    id: page.id || page.page_id || "",
+    title: getMealTitle(page),
+    date: getMealValue(page, "Date"),
+    type: getMealValue(page, "Meal Type"),
+    status: getMealValue(page, "Status"),
+    ingredients: getMealValue(page, "Ingredients"),
+    instructions: getMealValue(page, "Preparation Notes"),
+    link: getMealValue(page, "Recipe Link")
+  })).sort((a, b) => {
+    if (!a.date) return 1;
+    if (!b.date) return -1;
+    return a.date.localeCompare(b.date);
+  });
+}
+
+async function loadMeals() {
+  clearStatus();
+  mealCards.innerHTML = '<div class="empty-state">Gathering your recipes…</div>';
+
+  try {
+    const data = await apiRequest("meal-planner");
+    meals = extractMeals(data);
+
+    document.getElementById("lastUpdated").textContent =
+      "Updated " + new Date().toLocaleTimeString([], {
+        hour: "numeric", minute: "2-digit"
+      });
+
+    if (!meals.length) {
+      selectedMealId = null;
+      renderMeals();
+      recipePanel.innerHTML = `
+        <div class="empty-state">
+          <strong>Your table is ready.</strong>
+          No meals were found yet. Add a meal through Quick Entry
+          and it will appear here.
+        </div>`;
+      return;
+    }
+
+    if (!meals.some(m => m.id === selectedMealId)) {
+      selectedMealId = meals[0].id;
+    }
+
+    renderMeals();
+    showRecipe(selectedMealId);
+
+  } catch (error) {
+    mealCards.innerHTML = "";
+    recipePanel.innerHTML = `
+      <div class="empty-state">
+        <strong>We couldn't reach your kitchen.</strong>
+        Open Settings to check your Widget Access Key, then refresh.
+      </div>`;
+    showStatus(error.message, "error");
+  }
+}
+
+function isDateMatch(meal, filter) {
+  if (filter === "all") return true;
+  if (!meal.date) return filter === "future";
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const date = getMealDate(meal);
+  if (!date || isNaN(date)) return false;
+  date.setHours(0, 0, 0, 0);
+
+  const diff = Math.round((date - today) / 86400000);
+
+  if (filter === "today") return diff === 0;
+  if (filter === "week") return diff >= 0 && diff <= 7;
+  if (filter === "future") return diff >= 0;
+  if (filter === "past") return diff < 0;
+
+  return true;
+}
+
+function renderMeals() {
+  const type = document.getElementById("mealTypeFilter").value;
+  const date = document.getElementById("dateFilter").value;
+  const search = document.getElementById("searchInput").value.toLowerCase();
+
+  const filtered = meals.filter(meal => {
+    const typeMatch = type === "all" || meal.type.toLowerCase() === type.toLowerCase();
+    const dateMatch = isDateMatch(meal, date);
+    const searchMatch = [
+      meal.title, meal.ingredients, meal.instructions, meal.type
+    ].join(" ").toLowerCase().includes(search);
+
+    return typeMatch && dateMatch && searchMatch;
+  });
+
+  document.getElementById("mealCount").textContent =
+    filtered.length + (filtered.length === 1 ? " meal" : " meals");
+
+  mealCards.innerHTML = "";
+
+  if (!filtered.length) {
+    mealCards.innerHTML = `
+      <div class="empty-state">
+        No meals match those filters.
+        <br>Try another date or meal type.
+      </div>`;
+    return;
+  }
+
+  filtered.forEach(meal => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "meal-card" +
+      (meal.id === selectedMealId ? " active" : "");
+
+    const title = document.createElement("span");
+    title.className = "meal-card-title";
+    title.textContent = meal.title;
+
+    const meta = document.createElement("span");
+    meta.className = "meal-card-meta";
+    meta.textContent = formatDate(meal.date) +
+      (meal.status ? " · " + meal.status : "");
+
+    button.appendChild(title);
+    button.appendChild(meta);
+
+    if (meal.type) {
+      const tag = document.createElement("span");
+      tag.className = "meal-type";
+      tag.textContent = meal.type;
+      button.appendChild(tag);
+    }
+
+    button.addEventListener("click", () => {
+      selectedMealId = meal.id;
+      renderMeals();
+      showRecipe(meal.id);
+    });
+
+    mealCards.appendChild(button);
+  });
+}
+
+function addTextSection(parent, heading, content, className) {
+  const section = document.createElement("section");
+  section.className = "recipe-section " + (className || "");
+
+  const title = document.createElement("h3");
+  title.textContent = heading;
+
+  const text = document.createElement("div");
+  text.className = "recipe-text";
+  text.textContent = content || "Nothing added yet.";
+
+  section.appendChild(title);
+  section.appendChild(text);
+  parent.appendChild(section);
+}
+
+function showRecipe(id) {
+  const meal = meals.find(m => m.id === id);
+  if (!meal) return;
+
+  recipePanel.innerHTML = "";
+
+  const top = document.createElement("div");
+  top.className = "recipe-top";
+
+  const eyebrow = document.createElement("div");
+  eyebrow.className = "recipe-eyebrow";
+  eyebrow.textContent = "From your meal plan";
+
+  const title = document.createElement("h2");
+  title.className = "recipe-title";
+  title.textContent = meal.title;
+
+  const meta = document.createElement("div");
+  meta.className = "recipe-meta";
+
+  [formatDate(meal.date), meal.type, meal.status]
+    .filter(Boolean)
+    .forEach(value => {
+      const pill = document.createElement("span");
+      pill.className = "meta-pill";
+      pill.textContent = value;
+      meta.appendChild(pill);
+    });
+
+  top.appendChild(eyebrow);
+  top.appendChild(title);
+  top.appendChild(meta);
+  recipePanel.appendChild(top);
+
+  const content = document.createElement("div");
+  content.className = "recipe-content";
+
+  addTextSection(content, "Ingredients", meal.ingredients, "ingredients-section");
+  addTextSection(content, "Instructions", meal.instructions, "instructions-section");
+
+  recipePanel.appendChild(content);
+
+  if (meal.link && /^https?:\/\//i.test(meal.link)) {
+    const link = document.createElement("a");
+    link.className = "recipe-link";
+    link.href = meal.link;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = "OPEN ORIGINAL RECIPE ↗";
+    recipePanel.appendChild(link);
+  }
+}
+
+loadMeals();
+</script>
+</body>
+</html>
