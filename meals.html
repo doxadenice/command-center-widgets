@@ -97,9 +97,18 @@ button, select, input {
   cursor: pointer;
   font-size: 11px;
   letter-spacing: .5px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .control-button:hover {
+  background: var(--white);
+}
+
+.home-button {
+  border-color: var(--gold);
   background: var(--white);
 }
 
@@ -434,6 +443,7 @@ footer {
   .topbar { align-items: stretch; }
   .topbar-left, .topbar-right { width: 100%; }
   .topbar-right button { flex: 1; }
+  .topbar-left .home-button { flex: 0 0 auto; }
   .filters select { flex: 1; }
 }
 </style>
@@ -451,6 +461,10 @@ footer {
 
 <div class="topbar">
   <div class="topbar-left">
+    <a class="control-button home-button"
+       href="https://doxadenice.github.io/command-center-widgets/home.html">
+      ⌂ HOME
+    </a>
     <button class="control-button" id="todayButton" type="button">↻ Refresh</button>
     <span class="count" id="lastUpdated">Connecting to your kitchen…</span>
   </div>
@@ -644,7 +658,6 @@ function getProperty(page, name) {
 }
 
 function getMealValue(page, name) {
-  // Also supports already simplified property values if returned by the Worker.
   const direct = page[name];
   if (direct !== undefined && direct !== null) {
     if (typeof direct === "string" || typeof direct === "number") return String(direct);
